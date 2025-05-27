@@ -4,8 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+
 @Repository
-public interface UserRepository extends JpaRepository<UserBean, Integer> {
-    Optional<UserBean> findByEmail(String email);
+public interface RoleRepository extends JpaRepository<RoleBean, Integer> {
+    Optional<RoleBean> findByName(String name);
 
 }
