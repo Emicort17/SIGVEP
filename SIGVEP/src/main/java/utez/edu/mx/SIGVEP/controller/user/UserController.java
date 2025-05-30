@@ -17,7 +17,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@Validated
 public class UserController {
 
 

@@ -95,8 +95,6 @@ public class UserService {
 
         if (UserDto.getContrasena() != null && !UserDto.getContrasena().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(UserDto.getContrasena());
-            logger.info("Contraseña original: {}", UserDto.getContrasena());
-            logger.info("Contraseña encriptada: {}", encodedPassword);
             usuario.setPassword(encodedPassword);
         } else if (isNew) {
             throw new IllegalArgumentException("La contraseña es obligatoria para un nuevo usuario.");
@@ -116,27 +114,18 @@ public class UserService {
 
     @Transactional
     public UserDto createUsuarioByRole(UserDto UserDto, String roleName) {
-        logger.info("Buscando rol con nombre: {}", roleName);
 
-        // Buscar el rol en la base de datos
         Optional<RoleBean> role = roleDao.findByName(roleName);
         if (!role.isPresent()) {
-            logger.error("Rol no encontrado: {}", roleName);
             throw new IllegalArgumentException("El rol especificado no existe: " + roleName);
         }
 
-        // Crear y asignar el usuario con el rol encontrado
         UserBean usuario = new UserBean();
-        logger.info("Asignando datos al usuario con email: {}", UserDto.getEmail());
         setUsuarioData(usuario, UserDto, true);
 
-        // Asignar el rol encontrado
         usuario.setRole(role.get());
-        logger.info("Rol asignado: {}", role.get().getName());
 
-        // Guardar el usuario en la base de datos
         UserBean savedUsuario = usuarioDao.save(usuario);
-        logger.info("Usuario creado con éxito: ID {}", savedUsuario.getId_usuario());
 
         return toDTO(savedUsuario);
     }
