@@ -66,8 +66,8 @@ public class CategoryService {
     public Optional<CategoryDto> patch(Integer id){
         if(categoryDao.existsById(id)){
             CategoryBean category = categoryDao.findById(id).get();
-            Boolean estatus = category.getEstatus();
-            category.setEstatus(!estatus);
+            Boolean estatus = category.getStatus();
+            category.setStatus(!estatus);
             return Optional.of(toDTO(category));
         }
         return Optional.empty();
@@ -75,22 +75,22 @@ public class CategoryService {
 
     private CategoryDto toDTO(CategoryBean categoryBean){
         return CategoryDto.builder()
-                .id_categoria(categoryBean.getId_categoria())
-                .nombre(categoryBean.getNombre())
-                .descripcion(categoryBean.getDescripcion())
-                .estatus(categoryBean.getEstatus())
+                .id_category(categoryBean.getId_category())
+                .name(categoryBean.getName())
+                .description(categoryBean.getDescription())
+                .status(categoryBean.getStatus())
                 .products(categoryBean.getProducts())
                 .build();
     }
 
     private void setCategoryData(CategoryBean categoryBean, CategoryDto categoryDto, Boolean isNew){
         logger.info("Registrando categoria...");
-        categoryBean.setNombre(categoryDto.getNombre());
-        categoryBean.setDescripcion(categoryDto.getDescripcion());
+        categoryBean.setName(categoryDto.getName());
+        categoryBean.setDescription(categoryDto.getDescription());
         categoryBean.setProducts(categoryDto.getProducts());
         if(isNew){
-            categoryBean.setEstatus(true);
+            categoryBean.setStatus(true);
         }
-        logger.info("Configurando del categoria... {}", categoryBean.getNombre());
+        logger.info("Configurando del categoria... {}", categoryBean);
     }
 }

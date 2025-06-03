@@ -15,52 +15,24 @@ import utez.edu.mx.SIGVEP.model.category.CategoryBean;
 public class ProductBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_producto;
+    @Column(name = "id_producto", nullable = false)
+    private Integer id_product;
 
-    @Column(name = "clave", nullable = false)
-    private String clave;
+    @Column(name = "nombre", nullable = false)
+    private String name;
 
     @Column(name = "precio_unitario", nullable = false)
-    private Double precio_unitario;
+    private Double unit_price;
 
-    @Column(name = "estatus", nullable = false)
-    private Boolean estatus;
+    @Column(name = "stock", nullable = false)
+    private Long stock;
+
+    @Column(name = "estado", nullable = false)
+    private Boolean status;
 
     @ManyToOne
-    @JoinColumn(name = "id_categoria")
+    @JoinColumn(name = "id_category")
     private CategoryBean category;
-
-    public String getClave() {
-        return clave;
-    }
-
-    public void setClave(String clave) {
-        this.clave = clave;
-    }
-
-    public Boolean getEstatus() {
-        return estatus;
-    }
-
-    public void setEstatus(Boolean estatus) {
-        this.estatus = estatus;
-    }
-
-    public Integer getId_producto() {
-        return id_producto;
-    }
-
-    public void setId_producto(Integer id_producto) {
-        this.id_producto = id_producto;
-    }
-
-    public Double getPrecio_unitario() {
-        return precio_unitario;
-    }
-
-    public void setPrecio_unitario(Double precio_unitario) {
-        this.precio_unitario = precio_unitario;
-    }
 
     public CategoryBean getCategory() {
         return category;
@@ -68,5 +40,45 @@ public class ProductBean {
 
     public void setCategory(CategoryBean category) {
         this.category = category;
+    }
+
+    public Double getUnit_price() {
+        return unit_price;
+    }
+
+    public void setUnit_price(Double unit_price) {
+        this.unit_price = unit_price;
+    }
+
+    public Long getStock() {
+        return stock;
+    }
+
+    public void setStock(Long stock) {
+        this.stock = stock;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getId_product() {
+        return id_product;
+    }
+
+    public void setId_product(Integer id_producto) {
+        this.id_product = id_producto;
     }
 }

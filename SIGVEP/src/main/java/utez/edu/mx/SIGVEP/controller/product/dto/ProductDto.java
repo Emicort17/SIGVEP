@@ -10,26 +10,26 @@ import utez.edu.mx.SIGVEP.model.product.ProductBean;
 @NoArgsConstructor
 @Builder
 public class ProductDto {
-    private Integer id_producto;
-    private String clave;
-    private Double precio_unitario;
-    private Boolean estatus;
+    private Integer id_product;
+    private String name;
+    private Double unit_price;
+    private Boolean status;
     private CategoryBean category;
 
     public ProductDto(ProductBean productEntity) {
-        this.id_producto = productEntity.getId_producto();
-        this.clave = productEntity.getClave();
-        this.precio_unitario = productEntity.getPrecio_unitario();
-        this.estatus = productEntity.getEstatus();
-        this.category = productEntity.getCategory();
+        this.id_product = productEntity.getId_product();
+        this.name = productEntity.getName();
+        this.unit_price = productEntity.getUnit_price();
+        this.status = productEntity.getStatus();
+        this.category = new CategoryBean();
     }
 
     public ProductBean toEntity(){
         ProductBean productBean = new ProductBean();
-        productBean.setId_producto(this.id_producto);
-        productBean.setClave(this.clave);
-        productBean.setPrecio_unitario(this.precio_unitario);
-        productBean.setEstatus(true);
+        productBean.setId_product(this.id_product);
+        productBean.setName(this.name);
+        productBean.setUnit_price(this.unit_price);
+        productBean.setStatus(this.status);
         productBean.setCategory(this.category);
         return productBean;
     }

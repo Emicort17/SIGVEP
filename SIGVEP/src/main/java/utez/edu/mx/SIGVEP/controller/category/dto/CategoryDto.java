@@ -14,25 +14,25 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class CategoryDto {
-    private Integer id_categoria;
-    private String nombre, descripcion;
-    private Boolean estatus;
+    private Integer id_category;
+    private String name, description;
+    private Boolean status;
     private Set<ProductBean> products;
 
     public CategoryDto(CategoryBean categoryEntity){
-        this.id_categoria = categoryEntity.getId_categoria();
-        this.nombre = categoryEntity.getNombre();
-        this.descripcion = categoryEntity.getDescripcion();
-        this.estatus = categoryEntity.getEstatus();
+        this.id_category = categoryEntity.getId_category();
+        this.name = categoryEntity.getName();
+        this.description = categoryEntity.getDescription();
+        this.status = categoryEntity.getStatus();
         this.products = categoryEntity.getProducts();
     }
 
     public CategoryBean toEntity() {
         CategoryBean categoryEntity = new CategoryBean();
-        categoryEntity.setId_categoria(this.id_categoria);
-        categoryEntity.setNombre(this.nombre);
-        categoryEntity.setDescripcion(this.descripcion);
-        categoryEntity.setEstatus(true);
+        categoryEntity.setId_category(this.id_category);
+        categoryEntity.setName(this.name);
+        categoryEntity.setDescription(this.description);
+        categoryEntity.setStatus(true);
         categoryEntity.setProducts(this.products);
         return categoryEntity;
     }

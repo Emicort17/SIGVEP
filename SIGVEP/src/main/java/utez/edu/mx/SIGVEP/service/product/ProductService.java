@@ -1,12 +1,10 @@
 package utez.edu.mx.SIGVEP.service.product;
 
-import jakarta.persistence.Access;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.SIGVEP.controller.product.dto.ProductDto;
-import utez.edu.mx.SIGVEP.model.category.CategoryRepository;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.product.ProductRepository;
 
@@ -65,8 +63,8 @@ public class ProductService {
     public Optional<ProductDto> patch(Integer id){
         if(productDao.existsById(id)){
             ProductBean productBean = productDao.findById(id).get();
-            Boolean estatus = productBean.getEstatus();
-            productBean.setEstatus(!estatus);
+            Boolean estatus = productBean.getStatus();
+            productBean.setStatus(!estatus);
             return Optional.of(toDTO(productBean));
         }
         return Optional.empty();
@@ -74,22 +72,22 @@ public class ProductService {
 
     private ProductDto toDTO(ProductBean productBean) {
         return ProductDto.builder()
-                .id_producto(productBean.getId_producto())
-                .clave(productBean.getClave())
-                .precio_unitario(productBean.getPrecio_unitario())
-                .estatus(productBean.getEstatus())
+                .id_product(productBean.getId_product())
+                .name(productBean.getName())
+                .unit_price(productBean.getUnit_price())
+                .status(productBean.getStatus())
                 .category(productBean.getCategory())
                 .build();
     }
 
     private void setProductData(ProductBean productBean, ProductDto productDto, Boolean isNew ) {
         logger.info("Registrando usuario...");
-        productBean.setId_producto(productDto.getId_producto());
-        productBean.setClave(productDto.getClave());
-        productBean.setPrecio_unitario(productDto.getPrecio_unitario());
+        productBean.setId_product(productDto.getId_product());
+        productBean.setName(productDto.getName());
+        productBean.setUnit_price(productDto.getUnit_price());
         productBean.setCategory(productDto.getCategory());
         if(isNew){
-            productBean.setEstatus(true);
+            productBean.setStatus(true);
         }
         logger.info("Configuracion del producto... {}", productBean);
     }

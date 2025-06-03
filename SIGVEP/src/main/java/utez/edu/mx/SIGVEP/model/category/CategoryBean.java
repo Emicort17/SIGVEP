@@ -20,51 +20,36 @@ import java.util.Set;
 public class CategoryBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_categoria;
+    @Column(name = "id_categoria", nullable = false)
+    private Integer id_category;
 
     @Column(name = "nombre", nullable = false)
-    private String nombre;
+    private String name;
 
     @Column(name = "descripcion", nullable = false)
-    private String descripcion;
+    private String description;
 
-    @Column(name = "estatus", nullable = false)
-    private Boolean estatus;
+    @Column(name = "estado", nullable = false)
+    private Boolean status;
 
     @OneToMany(mappedBy = "category")
     @JsonIgnore
     private Set<ProductBean> products;
 
-    public String getNombre() {
-        return nombre;
+    public String getDescription() {
+        return description;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Integer getId_categoria() {
-        return id_categoria;
+    public Boolean getStatus() {
+        return status;
     }
 
-    public void setId_categoria(Integer id_categoria) {
-        this.id_categoria = id_categoria;
-    }
-
-    public Boolean getEstatus() {
-        return estatus;
-    }
-
-    public void setEstatus(Boolean estatus) {
-        this.estatus = estatus;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setStatus(Boolean status) {
+        this.status = status;
     }
 
     public Set<ProductBean> getProducts() {
@@ -73,5 +58,21 @@ public class CategoryBean {
 
     public void setProducts(Set<ProductBean> products) {
         this.products = products;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getId_category() {
+        return id_category;
+    }
+
+    public void setId_category(Integer id_categoria) {
+        this.id_category = id_categoria;
     }
 }
