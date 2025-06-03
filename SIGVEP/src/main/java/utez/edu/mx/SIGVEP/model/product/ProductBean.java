@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import utez.edu.mx.SIGVEP.model.category.CategoryBean;
 
-
 @Entity
 @Table(name = "producto")
 @AllArgsConstructor

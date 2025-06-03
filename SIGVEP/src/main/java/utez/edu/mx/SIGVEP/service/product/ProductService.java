@@ -75,6 +75,7 @@ public class ProductService {
                 .id_product(productBean.getId_product())
                 .name(productBean.getName())
                 .unit_price(productBean.getUnit_price())
+                .stock(productBean.getStock())
                 .status(productBean.getStatus())
                 .category(productBean.getCategory())
                 .build();
@@ -82,9 +83,9 @@ public class ProductService {
 
     private void setProductData(ProductBean productBean, ProductDto productDto, Boolean isNew ) {
         logger.info("Registrando usuario...");
-        productBean.setId_product(productDto.getId_product());
         productBean.setName(productDto.getName());
         productBean.setUnit_price(productDto.getUnit_price());
+        productBean.setStock(productDto.getStock());
         productBean.setCategory(productDto.getCategory());
         if(isNew){
             productBean.setStatus(true);
