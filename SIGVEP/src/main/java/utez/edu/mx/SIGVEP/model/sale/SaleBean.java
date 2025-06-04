@@ -27,9 +27,9 @@ public class SaleBean {
     @Column(name = "status", columnDefinition = "BOOL DEFAULT true")
     private Boolean status;
 
-   /*
+
    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
-    private UserBean usuario;
-    */
+    private UserBean user;
+
 }

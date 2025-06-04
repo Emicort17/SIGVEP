@@ -1,7 +1,11 @@
 package utez.edu.mx.SIGVEP.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import utez.edu.mx.SIGVEP.model.sale.SaleBean;
+
+import java.util.Set;
 
 
 @AllArgsConstructor
@@ -30,6 +34,11 @@ public class UserBean {
     @ManyToOne
     @JoinColumn(name = "id_role")
     private RoleBean role;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private Set<SaleBean> sale;
+
 
     public Integer getId_usuario() {
         return id_usuario;
@@ -78,4 +87,6 @@ public class UserBean {
     public void setRole(RoleBean role) {
         this.role = role;
     }
+
+
 }
