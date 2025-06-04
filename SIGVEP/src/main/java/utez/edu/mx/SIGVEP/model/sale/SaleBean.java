@@ -1,9 +1,12 @@
 package utez.edu.mx.SIGVEP.model.sale;
+import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,5 +34,13 @@ public class SaleBean {
    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
     private UserBean user;
+
+    @ManyToMany
+    @JoinTable(
+            name = "sale_product",
+            joinColumns = @JoinColumn(name = "sale_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<ProductBean> products = new ArrayList<>();
 
 }

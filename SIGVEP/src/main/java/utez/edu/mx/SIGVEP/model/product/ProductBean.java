@@ -4,6 +4,10 @@ package utez.edu.mx.SIGVEP.model.product;
 import jakarta.persistence.*;
 import lombok.*;
 import utez.edu.mx.SIGVEP.model.category.CategoryBean;
+import utez.edu.mx.SIGVEP.model.sale.SaleBean;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "producto")
@@ -80,4 +84,8 @@ public class ProductBean {
     public void setId_product(Integer id_producto) {
         this.id_product = id_producto;
     }
+
+    @ManyToMany(mappedBy = "products")
+    private List<SaleBean> sales = new ArrayList<>();
+
 }
