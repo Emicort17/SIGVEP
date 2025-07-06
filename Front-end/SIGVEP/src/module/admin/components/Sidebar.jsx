@@ -1,17 +1,30 @@
 import React from 'react'
 import { useNavigate, NavLink } from 'react-router-dom'
 import IconWText from '../../../assets/iconwtext.svg'
-import House from '../../../assets/housenp.svg'
+import House from '../../../assets/housed.svg'
 import HouseActive from '../../../assets/house.svg'
+import Person from '../../../assets/persond.svg'
+import PersonActive from '../../../assets/person.svg'
+import Users from '../../../assets/usersd.svg'
+import UsersActive from '../../../assets/users.svg'
+import Category from '../../../assets/categoryd.svg'
+import CategoryActive from '../../../assets/category.svg'
+import Products from '../../../assets/productsd.svg'
+import ProductsActive from '../../../assets/products.svg'
+import Sale from '../../../assets/saled.svg'
+import SaleActive from '../../../assets/sale.svg'
+import Binnacle from '../../../assets/binnacled.svg'
+import BinnacleActive from '../../../assets/binnacle.svg'
+
 
 const menu = [
     { label: 'Inicio', path: '/admin', icon: House, iconActive: HouseActive },
-    //   { label: 'Perfil', path: '/admin/profile', icon: require('../../assets/user.svg'), iconActive: require('../../assets/userb.svg') },
-    //   { label: 'Usuarios', path: '/admin/users', icon: require('../../assets/users.svg'), iconActive: require('../../assets/usersb.svg') },
-    //   { label: 'Categorías', path: '/admin/categories', icon: require('../../assets/categories.svg'), iconActive: require('../../assets/categoriesb.svg') },
-    //   { label: 'Productos', path: '/admin/products', icon: require('../../assets/tag.svg'), iconActive: require('../../assets/tagb.svg') },
-    //   { label: 'Ventas', path: '/admin/sales', icon: require('../../assets/sales.svg'), iconActive: require('../../assets/salesb.svg') },
-    //   { label: 'Bitácora', path: '/admin/log', icon: require('../../assets/log.svg'), iconActive: require('../../assets/logb.svg') },
+    { label: 'Perfil', path: '/admin/profile', icon: Person, iconActive: PersonActive },
+    { label: 'Usuarios', path: '/admin/users', icon: Users, iconActive: UsersActive },
+    { label: 'Categorías', path: '/admin/categories', icon: Category, iconActive: CategoryActive },
+    { label: 'Productos', path: '/admin/products', icon: Products, iconActive: ProductsActive },
+    { label: 'Ventas', path: '/admin/sales', icon: Sale, iconActive: SaleActive },
+    { label: 'Bitácora', path: '/admin/log', icon: Binnacle, iconActive: BinnacleActive },
 ]
 
 const Sidebar = ({ show = true }) => {
