@@ -44,10 +44,10 @@ const SignIn = () => {
           localStorage.setItem('user', JSON.stringify(response.data.user));
           navigate("/", { replace: true });
         } else {
-          alertaError("Error", "Error al iniciar sesión. Por favor, verifica tus credenciales.");
+          alertaExito("Error", "Error al iniciar sesión. Por favor, verifica tus credenciales.");
         }
       } catch (error) {
-        alertaError("Error", "Correo y/o contraseña incorrectos");
+        alertaExito("Error", "Correo y/o contraseña incorrectos");
       } finally {
         setSubmitting(false);
       }
@@ -64,7 +64,7 @@ const SignIn = () => {
         <div className="w-full md:w-1/3 flex items-center justify-center bg-white">
           <div className="w-full max-w-sm p-8">
             <div className="flex flex-col items-center mb-8">
-              <img src={Logo} alt="Logo" className="w-20 h-20 mb-4" />
+              <img src={Logo} alt="Logo" className="w-20 h-20 mb-4 " />
               <h2 className="text-2xl font-bold text-blue-900">Iniciar sesión</h2>
             </div>
             <form noValidate onSubmit={formik.handleSubmit}>

@@ -54,7 +54,7 @@ const ResetPassword = () => {
       <div className="w-full md:w-1/3 flex items-center justify-center bg-white">
         <div className="w-full max-w-sm p-8">
           <div className="flex flex-col items-center mb-8">
-            <img src={Logo} alt="Logo" className="w-20 h-20 mb-4" />
+            <img src={Logo} alt="Logo" className="w-20 h-20 mb-4 " />
             <h2 className="text-2xl font-semibold text-blue-900 mb-2">Recuperar Contraseña</h2>
           </div>
           <form noValidate onSubmit={formik.handleSubmit}>

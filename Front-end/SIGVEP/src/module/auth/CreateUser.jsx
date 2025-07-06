@@ -8,9 +8,11 @@ import Logo from '../../assets/iconw.svg';
 import Fondo from '../../assets/img/fondo.jpg';
 import Ojo from '../../assets/eye.svg';
 import Ojo1 from '../../assets/eye1.svg';
+import Car from '../../assets/car.svg';
+import Paper from '../../assets/paper.svg';
+import Sell from '../../assets/sell.svg';
 
 const CreateUser = () => {
-    // Por terminar...
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const navigate = useNavigate();
@@ -58,38 +60,44 @@ const CreateUser = () => {
     });
 
     return (
-        <div className="flex min-h-screen">
-            <div className="hidden md:flex flex-col w-3/4 h-screen items-center justify-center relative">
-                <img src={Fondo} alt="Fondo" className='w-full h-full object-cover absolute inset-0 z-0' />
-                <div className='relative z-10 flex flex-col w-full items-center justify-center'>
-                    <img src={Logo} alt="Logo" className="w-30 h-30 mb-8" />
-                    <div className="flex flex-col gap-6 w-96">
-                        <div className="bg-white bg-opacity-60 rounded-lg p-4 flex items-center gap-3 shadow">
-                            <span className="text-2xl">🛒</span>
+        <div className="flex min-h-screen relative">
+            <img src={Fondo} alt="Fondo" className='fixed w-full h-full object-cover inset-0 z-0' />
+            <div className="hidden md:flex flex-col w-3/4 h-screen items-center justify-center relative z-10">
+                <div className='md:w-1/3 fixed z-10 flex flex-col w-full items-center justify-center'>
+                    <img src={Logo} alt="Logo" className="w-30 h-30 mb-8 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" />
+                    <div className="flex flex-col gap-6 w-96 text-center">
+                        <div className="bg-white bg-opacity-80 rounded-lg p-2 flex flex-col items-center gap-2 shadow">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-custom">
+                                <img src={Car} alt="Car" className="w-6 h-6" />
+                            </div>
                             <div>
                                 <div className="font-semibold text-gray-800">Compra productos fácil y rápido</div>
-                                <div className="text-xs text-gray-600">Realiza compras en segundos.</div>
+                                <div className="text-sm text-gray-600">Realiza compras en segundos.</div>
                             </div>
                         </div>
-                        <div className="bg-white bg-opacity-60 rounded-lg p-4 flex items-center gap-3 shadow">
-                            <span className="text-2xl">📋</span>
+                        <div className="bg-white bg-opacity-80 rounded-lg p-2 flex flex-col items-center gap-2 shadow">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-custom">
+                                <img src={Paper} alt="Paper" className="w-6 h-6" />
+                            </div>
                             <div>
                                 <div className="font-semibold text-gray-800">Consulta tu historial de compras</div>
-                                <div className="text-xs text-gray-600">Mantén un control detallado.</div>
+                                <div className="text-sm text-gray-600">Mantén un control detallado.</div>
                             </div>
                         </div>
-                        <div className="bg-white bg-opacity-60 rounded-lg p-4 flex items-center gap-3 shadow">
-                            <span className="text-2xl">🏷️</span>
+                        <div className="bg-white bg-opacity-80 rounded-lg p-2 flex flex-col items-center gap-2 shadow">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-custom">
+                                <img src={Sell} alt="Sell" className="w-6 h-6" />
+                            </div>
                             <div>
                                 <div className="font-semibold text-gray-800">Todo al alcance de tu mano</div>
-                                <div className="text-xs text-gray-600">Simple e intuitiva, sin complicaciones.</div>
+                                <div className="text-sm text-gray-600">Simple e intuitiva, sin complicaciones.</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="w-full md:w-1/3 flex items-center justify-center bg-white">
+            <div className="w-full md:w-1/3 flex items-center justify-center bg-white z-20">
                 <div className="w-full max-w-sm p-8">
                     <h2 className="text-2xl font-semibold text-blue-900 mb-6 text-center">Crea una cuenta</h2>
                     <form noValidate onSubmit={formik.handleSubmit}>
