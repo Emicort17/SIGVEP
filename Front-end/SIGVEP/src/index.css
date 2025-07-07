@@ -111,9 +111,16 @@ body,
   border-top: 10px solid #1E3A8A;
 }
 
-/* Custom Buttons */
 .custom-blue {
   color: #1E3A8A;
+}
+
+.bg-custom-blue {
+  background-color: #1E3A8A;
+}
+
+.bg-custom-side {
+  background-color: #0EA5E9;
 }
 
 .bg-custom-bluelight {

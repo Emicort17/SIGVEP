@@ -116,7 +116,7 @@ const SignIn = () => {
               </div>
 
               <div className="mb-4 text-right mt-3">
-                <a href="#" className="custom-blue text-sm hover:underline">
+                <a className="custom-blue text-sm hover:underline cursor-pointer" onClick={() => navigate('/forgot-password')}>
                   ¿Has olvidado tu contraseña?
                 </a>
               </div>
@@ -131,7 +131,7 @@ const SignIn = () => {
 
               <div className="mt-4 text-center text-sm">
                 ¿No tienes una cuenta?{" "}
-                <a href="#" className="custom-blue hover:underline">
+                <a className="custom-blue hover:underline cursor-pointer" onClick={() => navigate('/create-user')}>
                   Regístrate
                 </a>
               </div>
