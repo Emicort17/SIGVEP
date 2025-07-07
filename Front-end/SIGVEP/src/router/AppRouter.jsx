@@ -16,11 +16,15 @@ import Profile from '../module/admin/Profile'
 import Users from '../module/admin/Users'
 import Sales from '../module/admin/Sales'
 import NewSales from '../module/admin/NewSales'
+import UserLayout from '../module/user/UserLayout'
+import ProductsU from '../module/user/ProductsU'
+import ProfileU from '../module/user/ProfileU'
+import NewSalesU from '../module/user/NewSalesU'
 
 const staticUser = {
   usuario: {
     rol: {
-      rol: "ADMIN" 
+      rol: "" 
     }
   },
   token: "fake-token"
@@ -32,7 +36,7 @@ const AppRouter = () => {
   const getRole = () => {
     if (user?.usuario?.rol.rol === "ADMIN") {
       return "ADMIN"
-    } else {
+    } else if (user?.usuario?.rol.rol === "USER") {
       return "USER"
     }
   }
@@ -62,11 +66,13 @@ const AppRouter = () => {
           </Route>
         )}
 
-        {/* {role === "USER" && (
-          <Route path="/user" element={<UserLayout />}>
-            <Route index element={<MainUser />} />
+        {role === "USER" && (
+          <Route path="/" element={<UserLayout />}>
+            <Route index element={<ProductsU />} />
+            <Route path="profile" element={<ProfileU />} />
+            <Route path="new-sale" element={<NewSalesU />} />
           </Route>
-        )} */}
+        )}
 
         <Route path="*" element={<NotFound404 />} />
       </Routes>
