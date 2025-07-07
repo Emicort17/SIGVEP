@@ -43,7 +43,7 @@ public class ProductController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PostMapping("/")
+    @PostMapping("/create")
     public ResponseEntity<ApiResponse> addProduct(@RequestBody ProductDto product) {
         ApiResponse response;
         try{

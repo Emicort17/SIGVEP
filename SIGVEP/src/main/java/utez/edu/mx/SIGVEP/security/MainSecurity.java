@@ -87,7 +87,9 @@ public class MainSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(WHITE_LIST).permitAll()
-                        .requestMatchers("/api/usuarios/**", "/api/productos/**","api/categorias/**").hasAuthority("ADMIN_ROLE")
+                        .requestMatchers("/api/ventas/create", "/api/productos/", "/api/categorias/").hasAnyAuthority("ADMIN_ROLE","USER_ROLE")
+                        .requestMatchers("/api/usuarios/**", "/api/productos/**","api/categorias/**", "api/ventas/**").hasAuthority("ADMIN_ROLE")
+
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

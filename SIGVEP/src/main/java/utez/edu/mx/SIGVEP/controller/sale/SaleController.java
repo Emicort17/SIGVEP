@@ -44,7 +44,7 @@ public class SaleController {
     }
 
     // Crear nueva venta
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<ApiResponse> createSale(@Valid @RequestBody SaleDto saleDto) {
         ApiResponse response;
         try {

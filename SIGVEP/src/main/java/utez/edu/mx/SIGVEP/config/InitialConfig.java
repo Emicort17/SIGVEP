@@ -27,6 +27,10 @@ public class InitialConfig implements CommandLineRunner {
         // Crear o buscar roles usando el patrón Builder
         RoleBean adminRole = getOrSaveRol(
                 RoleBean.builder().id_role(null).name("ADMIN_ROLE").user(null).build()
+        );
+
+        RoleBean userRole = getOrSaveRol(
+                RoleBean.builder().id_role(null).name("USER_ROLE").user(null).build()
 
         );
 
@@ -40,7 +44,20 @@ public class InitialConfig implements CommandLineRunner {
                         .role(adminRole)
                         .build()
         );
+
+        getOrSaveUser(
+                UserBean.builder()
+                        .email("user@example.com")
+                        .password(encoder.encode("user"))
+                        .status(true)
+                        .blocked(false)
+                        .role(userRole)
+                        .build()
+        );
+
     }
+
+
 
     // Método genérico para obtener o guardar un rol
     @Transactional

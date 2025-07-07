@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
+import utez.edu.mx.SIGVEP.model.user.token.PasswordResetToken;
 
 import java.util.Set;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Builder(builderClassName = "Builder", toBuilder = true)
 @ToString
@@ -39,54 +38,95 @@ public class UserBean {
     @JsonIgnore
     private Set<SaleBean> sale;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "passToken_id", referencedColumnName = "id")
+    private PasswordResetToken token;
 
     public Integer getId_usuario() {
         return id_usuario;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public Boolean getBlocked() {
-        return blocked;
-    }
-
-    public RoleBean getRole() {
-        return role;
     }
 
     public void setId_usuario(Integer id_usuario) {
         this.id_usuario = id_usuario;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
+    public Boolean getStatus() {
+        return status;
+    }
+
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+
+    public Boolean getBlocked() {
+        return blocked;
     }
 
     public void setBlocked(Boolean blocked) {
         this.blocked = blocked;
     }
 
+    public RoleBean getRole() {
+        return role;
+    }
+
     public void setRole(RoleBean role) {
         this.role = role;
     }
 
+    public Set<SaleBean> getSale() {
+        return sale;
+    }
 
+    public void setSale(Set<SaleBean> sale) {
+        this.sale = sale;
+    }
+
+    public PasswordResetToken getToken() {
+        return token;
+    }
+
+    public void setToken(PasswordResetToken token) {
+        this.token = token;
+    }
+
+    public UserBean() {
+    }
+
+    public UserBean(String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
+        this.email = email;
+        this.password = password;
+        this.status = status;
+        this.blocked = blocked;
+        this.role = role;
+        this.sale = sale;
+        this.token = token;
+    }
+
+    public UserBean(Integer id_usuario, String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
+        this.id_usuario = id_usuario;
+        this.email = email;
+        this.password = password;
+        this.status = status;
+        this.blocked = blocked;
+        this.role = role;
+        this.sale = sale;
+        this.token = token;
+    }
 }

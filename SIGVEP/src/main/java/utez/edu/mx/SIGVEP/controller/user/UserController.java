@@ -95,4 +95,17 @@ public class UserController {
         return new ResponseEntity<>(response, response.getStatus());
 
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse> cambiarEstadoUsuario(@PathVariable Integer id) {
+        Optional<UserDto> usuarioActualizado = usuarioService.patch(id);
+        ApiResponse response;
+
+        if (usuarioActualizado.isPresent()) {
+            response = new ApiResponse(usuarioActualizado.get(), HttpStatus.OK);
+        } else {
+            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado para cambiar estado");
+        }
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }

@@ -130,6 +130,17 @@ public class UserService {
         return toDTO(savedUsuario);
     }
 
+    @Transactional
+    public Optional<UserDto> patch(Integer id){
+        if(usuarioDao.existsById(id)){
+            UserBean user = usuarioDao.findById(id).get();
+            Boolean estatus = user.getStatus();
+            user.setStatus(!estatus);
+            return Optional.of(toDTO(user));
+        }
+        return Optional.empty();
+    }
+
 
     private UserDto toDTO(UserBean usuario) {
         return UserDto.builder()
