@@ -145,6 +145,9 @@ public class UserService {
     private UserDto toDTO(UserBean usuario) {
         return UserDto.builder()
                 .id_usuario(usuario.getId_usuario())
+                .nombre(usuario.getName())
+                .apellido(usuario.getSurname())
+                .telefono(usuario.getTelephone())
                 .email(usuario.getEmail())
                 .contrasena(usuario.getPassword())
                 .role(usuario.getRole())

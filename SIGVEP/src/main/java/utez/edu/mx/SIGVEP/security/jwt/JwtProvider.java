@@ -29,7 +29,6 @@
         private static final String TOKEN_HEADER = "Authorization";
         private static final String TOKEN_TYPE = "Bearer ";
 
-        // Generar un token JWT (versión 0.12.6 compatible)
         public String generateToken(Authentication auth) {
             UserDetails user = (UserDetails) auth.getPrincipal();
 
@@ -45,7 +44,6 @@
                     .compact();
         }
 
-        // Obtener la clave para firmar los tokens
         private SecretKey getSignKey() {
             byte[] keyBytes = Decoders.BASE64.decode(secret);
             return Keys.hmacShaKeyFor(keyBytes);

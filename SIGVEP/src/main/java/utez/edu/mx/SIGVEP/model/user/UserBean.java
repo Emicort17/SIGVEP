@@ -18,6 +18,15 @@ public class UserBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_usuario;
 
+    @Column(name = "nombre", nullable = false, columnDefinition = "VARCHAR(30)")
+    private String name;
+
+    @Column(name = "apellido", nullable = false, columnDefinition = "VARCHAR(50)")
+    private String surname;
+
+    @Column(name = "telefono", nullable = false, columnDefinition = "VARCHAR(10)")
+    private String telephone;
+
     @Column(name = "email", nullable = false)
     private String email;
 
@@ -48,6 +57,30 @@ public class UserBean {
 
     public void setId_usuario(Integer id_usuario) {
         this.id_usuario = id_usuario;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
     public String getEmail() {
@@ -109,7 +142,10 @@ public class UserBean {
     public UserBean() {
     }
 
-    public UserBean(String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
+    public UserBean(String name, String surname, String telephone, String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
+        this.name = name;
+        this.surname = surname;
+        this.telephone = telephone;
         this.email = email;
         this.password = password;
         this.status = status;
@@ -119,8 +155,12 @@ public class UserBean {
         this.token = token;
     }
 
-    public UserBean(Integer id_usuario, String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
+
+    public UserBean(Integer id_usuario, String name, String surname, String telephone, String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
         this.id_usuario = id_usuario;
+        this.name = name;
+        this.surname = surname;
+        this.telephone = telephone;
         this.email = email;
         this.password = password;
         this.status = status;

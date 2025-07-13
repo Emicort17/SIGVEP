@@ -9,6 +9,7 @@ import java.util.List;
 public class SignedDto {
     String token;
     String tokenType;
-    Object user;
-    List<? extends GrantedAuthority> authorities;
+    SimpleUserDto user;
+
 }
+

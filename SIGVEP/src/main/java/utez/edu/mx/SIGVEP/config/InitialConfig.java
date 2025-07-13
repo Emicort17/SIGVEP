@@ -24,7 +24,7 @@ public class InitialConfig implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        // Crear o buscar roles usando el patrón Builder
+
         RoleBean adminRole = getOrSaveRol(
                 RoleBean.builder().id_role(null).name("ADMIN_ROLE").user(null).build()
         );
@@ -34,9 +34,11 @@ public class InitialConfig implements CommandLineRunner {
 
         );
 
-        // Crear o buscar usuario administrador usando el patrón Builder
         getOrSaveUser(
                 UserBean.builder()
+                        .name("admin")
+                        .surname("admin")
+                        .telephone("7774915742")
                         .email("admin@example.com")
                         .password(encoder.encode("admin"))
                         .status(true)
@@ -47,6 +49,9 @@ public class InitialConfig implements CommandLineRunner {
 
         getOrSaveUser(
                 UserBean.builder()
+                        .name("user")
+                        .surname("user")
+                        .telephone("7774897655")
                         .email("user@example.com")
                         .password(encoder.encode("user"))
                         .status(true)

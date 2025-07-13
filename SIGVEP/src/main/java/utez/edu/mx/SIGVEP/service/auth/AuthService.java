@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.SIGVEP.config.ApiResponse;
 import utez.edu.mx.SIGVEP.controller.auth.dto.SignedDto;
+import utez.edu.mx.SIGVEP.controller.auth.dto.SimpleUserDto;
 import utez.edu.mx.SIGVEP.controller.user.dto.UserDto;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
 import utez.edu.mx.SIGVEP.security.jwt.JwtProvider;
@@ -80,9 +81,10 @@ public class AuthService {
             logger.info("Generando token JWT para el usuario: {}", usuario);
             String token = provider.generateToken(auth);
 
-            UserDto usuarioDto = new UserDto(user);
+            SimpleUserDto simpleUser = new SimpleUserDto(user.getId_usuario(), user.getRole().getName());
 
-            SignedDto signedDto = new SignedDto(token, "Bearer", usuarioDto, null);
+            SignedDto signedDto = new SignedDto(token, "Bearer", simpleUser);
+
             logger.info("Autenticación exitosa para el usuario: {}", usuario);
 
             return new ResponseEntity<>(
