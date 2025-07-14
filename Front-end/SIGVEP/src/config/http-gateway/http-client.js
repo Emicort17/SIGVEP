@@ -38,7 +38,7 @@ const responseHandler = (res) => Promise.resolve(res.data);
 const errorHandler = (err) => {
     if (err.response?.status === 401) {
         localStorage.removeItem("user");
-        window.location.href = "/";
+        window.location.href = "/sign-in";
     }
     return Promise.reject(err);
 };

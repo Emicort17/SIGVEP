@@ -12,9 +12,9 @@ import LogoutActive from '../../../assets/logout.svg'
 
 
 const menu = [
-    { label: 'Perfil', path: '/profile', icon: Person, iconActive: PersonActive },
-    { label: 'Productos', path: '/', icon: Products, iconActive: ProductsActive },
-]
+  { label: 'Productos', path: '/user', icon: Products, iconActive: ProductsActive },
+  { label: 'Perfil', path: '/user/profile', icon: Person, iconActive: PersonActive },
+];
 
 const Sidebar = ({ show = true }) => {
     const navigate = useNavigate()
@@ -32,6 +32,7 @@ const Sidebar = ({ show = true }) => {
                                 to={item.path}
                                 className="block"
                                 style={{ outline: 'none' }}
+                                end
                             >
                                 {({ isActive }) => (
                                     <div
@@ -57,9 +58,10 @@ const Sidebar = ({ show = true }) => {
                 </ul>
                 <div className="px-3 mt-2">
                     <NavLink
-                        to="new-sale"
+                        to="/usernew-sale"
                         className="block"
                         style={{ outline: 'none' }}
+                        end
                     >
                         {({ isActive }) => (
                             <div
@@ -87,6 +89,7 @@ const Sidebar = ({ show = true }) => {
                     to="/logout"
                     className="block"
                     style={{ outline: 'none' }}
+                    end
                 >
                     {({ isActive }) => (
                         <div

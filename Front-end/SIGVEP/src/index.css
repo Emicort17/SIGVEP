@@ -86,10 +86,10 @@ body,
 
 .loader2 {
   border: 5px solid #1E3A8A;
-  border-left-color: #D0DFBE;
+  border-left-color: #F3F4F6;
   border-radius: 50%;
-  width: 82px;
-  height: 82px;
+  width: 120px;
+  height: 120px;
   animation: spin 1s linear infinite;
 }
 

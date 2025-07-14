@@ -1,11 +1,10 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as yup from "yup";
-import { useFormik } from "formik";
-import AuthContext from "../../config/context/auth-context";
+import * as yup from 'yup';
+import { useFormik } from 'formik';
+import AuthContext from '../../config/context/auth-context';
 import { AxiosClient } from '../../config/http-gateway/http-client';
 import { alertaExito, alertaError, alertaCargando } from '../../config/context/alerts.js';
-
 import Logo from '../../assets/icon.svg';
 import Fondo from '../../assets/img/fondo.jpg';
 import Ojo from '../../assets/eye.svg';
@@ -20,34 +19,38 @@ const SignIn = () => {
 
   const formik = useFormik({
     initialValues: {
-      email: '',
+      emailOrUsername: '',
       password: ''
     },
     validationSchema: yup.object({
-      email: yup.string().email('Correo electrónico inválido').required('El correo electrónico es obligatorio'),
+      emailOrUsername: yup.string().email('Correo electrónico inválido').required('El correo electrónico es obligatorio'),
       password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es obligatoria')
     }),
     onSubmit: async (values, { setSubmitting }) => {
       alertaCargando("Iniciando sesión...", "Por favor, espera un momento.");
       try {
-        const response = await AxiosClient.post('/auth/login', values);
-        if (response.data && response.data.token) {
+        const response = await AxiosClient.post('/auth/signin', values);
+        console.log('SignIn response: ', response.data);
+        if (response.data && response.data.token && response.data.user) {
+          const { token, user } = response.data;
+          if (!user?.rol) {
+            alertaError('Error','El usuario no tiene un rol asignado');
+          }
+          const authData = { token, user, signed: true };
           dispatch({
             type: 'SIGNIN',
-            payload: {
-              token: response.data.token,
-              user: response.data.user
-            }
+            payload: authData,
           });
-          alertaExito("Inicio de sesión exitoso");
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-          navigate("/", { replace: true });
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(authData)); 
+          alertaExito('Inicio de sesión exitoso', 'Bienvenido al sistema SIGVEP');
+          const redirectTo = user.rol === 'ADMIN_ROLE' ? '/admin' : '/user';
+          navigate(redirectTo, { replace: true });
         } else {
-          alertaExito("Error", "Error al iniciar sesión. Por favor, verifica tus credenciales.");
+          alertaError("Error", "Error al iniciar sesión. Por favor, verifica tus credenciales.");
         }
       } catch (error) {
-        alertaExito("Error", "Correo y/o contraseña incorrectos");
+        alertaError("Error", "Correo y/o contraseña incorrectos");
       } finally {
         setSubmitting(false);
       }
@@ -69,21 +72,21 @@ const SignIn = () => {
             </div>
             <form noValidate onSubmit={formik.handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="email" className={labelStyles}>
+                <label htmlFor="emailOrUsername" className={labelStyles}>
                   Correo Electrónico:
                 </label>
                 <input
-                  id="email"
-                  name="email"
+                  id="emailOrUsername"
+                  name="emailOrUsername"
                   type="email"
-                  value={formik.values.email}
+                  value={formik.values.emailOrUsername}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   placeholder="Correo electrónico"
                   className={inputStyles}
                 />
-                {formik.touched.email && formik.errors.email && (
-                  <div className="text-red-600 text-sm mt-2">{formik.errors.email}</div>
+                {formik.touched.emailOrUsername && formik.errors.emailOrUsername && (
+                  <div className="text-red-600 text-sm mt-2">{formik.errors.emailOrUsername}</div>
                 )}
               </div>
               <div className="mb-2 relative">

@@ -1,14 +1,44 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
+import ProfileModal from './components/ProfileModal';
 import { Outlet } from 'react-router-dom'
+import { AxiosClient } from '../../config/http-gateway/http-client';
 
-const AdminLayout = () => (
-  <div className="flex min-h-screen">
-    <Sidebar />
-    <main className="min-h-screen p-6 pl-72">
-      <Outlet />
-    </main>
-  </div>
-)
+const AdminLayout = () => {
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  const handleProfileClick = () => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser?.user?.idUsuario) {
+      setIsProfileModalOpen(true);
+      fetchUserData(storedUser.user.idUsuario);
+    }
+  };
+
+  const fetchUserData = async (idUsuario) => {
+    try {
+      const response = await AxiosClient.get(`/usuarios/${idUsuario}`);
+      setUserData(response.data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  return (
+    <div className="flex h-screen">
+      <Sidebar show={true} onProfileClick={handleProfileClick} isProfileActive={isProfileModalOpen} />
+      <main className="min-h-screen p-6 pl-72">
+        <Outlet />
+      </main>
+      {isProfileModalOpen && userData && (
+        <ProfileModal
+          user={userData}
+          onClose={() => setIsProfileModalOpen(false)}
+        />
+      )}
+    </div>
+  );
+};
 
 export default AdminLayout

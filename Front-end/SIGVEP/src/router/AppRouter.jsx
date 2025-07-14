@@ -1,83 +1,184 @@
-import React, { useState } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import AdminLayout from '../module/admin/AdminLayout'
-import Main from '../module/admin/Main'
-import Products from '../module/admin/Products'
-import SignIn from '../module/auth/SignIn'
-import ForgotPassword from '../module/auth/ForgotPassword'
-import ResetPassword from '../module/auth/ResetPassword'
-import CreateUser from '../module/auth/CreateUser'
-import NotFound404 from '../module/auth/NotFound404'
-import InternalServerError500 from '../module/auth/InternalServerError500'
-import Forbidden403 from '../module/auth/Forbidden403'
-import Binnacle from '../module/admin/Binnacle'
-import Categories from '../module/admin/Categories'
-import Profile from '../module/admin/Profile'
-import Users from '../module/admin/Users'
-import Sales from '../module/admin/Sales'
-import NewSales from '../module/admin/NewSales'
-import UserLayout from '../module/user/UserLayout'
-import ProductsU from '../module/user/ProductsU'
-import ProfileU from '../module/user/ProfileU'
-import NewSalesU from '../module/user/NewSalesU'
+import React, { useState, useEffect, useContext } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import AuthContext from '../config/context/auth-context';
+import AdminLayout from '../module/admin/AdminLayout';
+import Main from '../module/admin/Main';
+import Products from '../module/admin/Products';
+import SignIn from '../module/auth/SignIn';
+import ForgotPassword from '../module/auth/ForgotPassword';
+import ResetPassword from '../module/auth/ResetPassword';
+import CreateUser from '../module/auth/CreateUser';
+import NotFound404 from '../module/auth/NotFound404';
+import InternalServerError500 from '../module/auth/InternalServerError500';
+import Forbidden403 from '../module/auth/Forbidden403';
+import Binnacle from '../module/admin/Binnacle';
+import Categories from '../module/admin/Categories';
+import Users from '../module/admin/Users';
+import Sales from '../module/admin/Sales';
+import NewSales from '../module/admin/NewSales';
+import UserLayout from '../module/user/UserLayout';
+import ProductsU from '../module/user/ProductsU';
+import ProfileU from '../module/user/ProfileU';
+import NewSalesU from '../module/user/NewSalesU';
+import Logo from '../assets/icon.svg';
 
-const staticUser = {
-  usuario: {
-    rol: {
-      rol: "" 
-    }
-  },
-  token: "fake-token"
-}
+const PublicRoute = ({ children }) => {
+  const { user: state } = useContext(AuthContext);
+  const rawUser = localStorage.getItem('user');
+  const localUser = rawUser ? JSON.parse(rawUser) : null;
+  const token = localUser?.token || localStorage.getItem('token');
+  const role = localUser?.user?.rol || state?.user?.rol || null;
 
-const AppRouter = () => {
-  const [user] = useState(staticUser)
+  console.log('PublicRoute: ', { token, role, state });
 
-  const getRole = () => {
-    if (user?.usuario?.rol.rol === "ADMIN") {
-      return "ADMIN"
-    } else if (user?.usuario?.rol.rol === "USER") {
-      return "USER"
-    }
+  if (token && role) {
+    return role === 'ADMIN_ROLE' ? (
+      <Navigate to="/admin" replace />
+    ) : role === 'USER_ROLE' ? (
+      <Navigate to="/user" replace />
+    ) : (
+      <Navigate to="/sign-in" replace />
+    );
   }
 
-  const role = getRole()
+  return children;
+};
+
+const ProtectedRoute = ({ children, allowedRole }) => {
+  const { user: state } = useContext(AuthContext);
+  const rawUser = localStorage.getItem('user');
+  const localUser = rawUser ? JSON.parse(rawUser) : null;
+  const token = localUser?.token || localStorage.getItem('token');
+  const role = localUser?.user?.rol || state?.user?.rol || null;
+
+  console.log('ProtectedRoute: ', { token, role, allowedRole, state });
+
+  if (!token) {
+    return <Navigate to="/sign-in" replace />;
+  }
+
+  if (!role || role !== allowedRole) {
+    return <Navigate to="/403" replace />;
+  }
+
+  return children;
+};
+
+const AppRouter = () => {
+  const { user: state, dispatch } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(true);
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    const rawUser = localStorage.getItem('user');
+    const localUser = rawUser ? JSON.parse(rawUser) : null;
+    const token = localUser?.token || localStorage.getItem('token');
+    const userRole = localUser?.user?.rol || state?.user?.rol || null;
+    console.log('AppRouter useEffect: ', { token, rawUser, localUser, userRole, state });
+    setRole(userRole);
+    setIsLoading(false);
+  }, [state]);
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="relative">
+          <div className="loader2"></div>
+          <img
+            src={Logo}
+            alt="logo"
+            className="w-20 h-20 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<SignIn />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/create-user" element={<CreateUser />} />
+        <Route
+          path="/sign-in"
+          element={
+            <PublicRoute>
+              <SignIn />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/create-user"
+          element={
+            <PublicRoute>
+              <CreateUser />
+            </PublicRoute>
+          }
+        />
         <Route path="/500" element={<InternalServerError500 />} />
         <Route path="/403" element={<Forbidden403 />} />
 
-        {role === "ADMIN" && (
-          <Route path="/" element={<AdminLayout />}>
-            <Route index element={<Main />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="users" element={<Users />} />
-            <Route path="categories" element={<Categories />} />
-            <Route path="products" element={<Products />} />
-            <Route path="sales" element={<Sales />} />
-            <Route path="log" element={<Binnacle />} />
-            <Route path="new-sale" element={<NewSales />} />
-          </Route>
-        )}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole="ADMIN_ROLE">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Main />} />
+          <Route path="users" element={<Users />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="products" element={<Products />} />
+          <Route path="sales" element={<Sales />} />
+          <Route path="log" element={<Binnacle />} />
+          <Route path="new-sale" element={<NewSales />} />
+        </Route>
 
-        {role === "USER" && (
-          <Route path="/" element={<UserLayout />}>
-            <Route index element={<ProductsU />} />
-            <Route path="profile" element={<ProfileU />} />
-            <Route path="new-sale" element={<NewSalesU />} />
-          </Route>
-        )}
+        <Route
+          path="/user"
+          element={
+            <ProtectedRoute allowedRole="USER_ROLE">
+              <UserLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ProductsU />} />
+          <Route path="profile" element={<ProfileU />} />
+          <Route path="new-sale" element={<NewSalesU />} />
+        </Route>
+
+        <Route
+          path="/"
+          element={
+            role === 'ADMIN_ROLE' ? (
+              <Navigate to="/admin" replace />
+            ) : role === 'USER_ROLE' ? (
+              <Navigate to="/user" replace />
+            ) : (
+              <Navigate to="/sign-in" replace />
+            )
+          }
+        />
 
         <Route path="*" element={<NotFound404 />} />
       </Routes>
     </BrowserRouter>
-  )
-}
+  );
+};
 
-export default AppRouter
+export default AppRouter;
