@@ -28,13 +28,14 @@ const AdminLayout = () => {
   return (
     <div className="flex h-screen">
       <Sidebar show={true} onProfileClick={handleProfileClick} isProfileActive={isProfileModalOpen} />
-      <main className="min-h-screen p-6 pl-72">
+      <main className="min-h-screen max-md:p-6 md:pl-72 transition-all min-md:p-6 max-md:py-20">
         <Outlet />
       </main>
       {isProfileModalOpen && userData && (
         <ProfileModal
           user={userData}
           onClose={() => setIsProfileModalOpen(false)}
+          isOpen={isProfileModalOpen}
         />
       )}
     </div>

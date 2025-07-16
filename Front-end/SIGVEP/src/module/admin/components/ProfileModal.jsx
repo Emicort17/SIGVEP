@@ -1,145 +1,108 @@
-import React, { useState } from 'react';
-import Logo from '../../../assets/iconw.svg';
-// import EditProfile from './EditProfile';
-// import EditPassword from './EditPassword';
+import React, { useState } from "react";
+import Logo from "../../../assets/iconwcomplete.svg";
+import Edit from "../../../assets/edit.svg";
+import Lock from "../../../assets/lock.svg";
+import Close from "../../../assets/closeb.svg";
+import EditInformation from "./EditInformation";
+import ChangePasswordModal from "./ChangePasswordModal";
 
-const ProfileModal = ({ user, onClose }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isChangePassword, setIsChangePassword] = useState(false);
+function ProfileModal({ isOpen, onClose, user }) {
+  if (!isOpen) return null;
+  const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
-  const handleEditModalToggle = () => {
-    setIsEditing(!isEditing);
-    setIsChangePassword(false);
-  };
+  const nombre = user?.nombre || "";
+  const apellido = user?.apellido || "";
+  const nombreCompleto = nombre + " " + apellido;
+  const telefono = user?.telefono || "";
+  const email = user?.email || "";
 
-  const handleChangePasswordModalToggle = () => {
-    setIsChangePassword(!isChangePassword);
-    setIsEditing(false);
-  };
+  const handleEditModalToggle = () => setShowModalEdit(true);
+  const handleCerrarModalEdit = () => setShowModalEdit(false);
+  const handleOpenChangePasswordModal = () => setShowChangePasswordModal(true);
+  const handleCloseChangePasswordModal = () => setShowChangePasswordModal(false);
 
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-center justify-center"
-      style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      }}
-    >
-      {!isEditing && !isChangePassword ? (
+    <>
+      <div
+        className="fixed inset-0 z-40 flex items-center justify-center"
+        style={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+      >
         <div
-          className="flex absolute right-2/5 bg-custom-blue rounded-l-lg"
-          style={{
-            top: '11%',
-          }}
+          className="flex flex-col md:flex-row absolute rounded-lg w-full max-w-[80vw] md:max-w-2xl mx-auto top-1/2 left-1/2 min-md:top-3/12 min-md:left-5/12 -translate-x-1/2 -translate-y-1/2"
+        // style={{
+        //   top: "4rem",
+        //   left: "18rem",
+        // }}
         >
-          <div className="bg-custom-green1 rounded-l-lg shadow-lg w-60 flex items-center hidden md:flex">
+          <div className="bg-custom-blue max-md:hidden min-md:rounded-l-lg max-md:rounded-t-lg shadow-lg w-full md:w-60 py-6 flex items-center justify-center md:py-0">
             <img
               src={Logo}
               alt="Logo"
-              className="justify-center mx-auto w-60"
+              className="justify-center mx-auto min-md:w-28 max-md:w-20"
             />
           </div>
-
-          <div className="bg-white rounded-r-lg shadow-lg max-w-lg w-full relative p-4 dark:bg-gray-900">
+          <div className="bg-white min-md:rounded-r-lg max-md:rounded-lg shadow-lg max-w-lg w-full relative p-4">
             <div className="grid justify-end">
               <button onClick={onClose} className="cursor-pointer">
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <img src={Close} alt="Cerrar" className="w-6 h-6 max-md:mb-2" />
               </button>
             </div>
 
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold font-poppins">
-                Perfil Administrador {user?.usuario?.usuario || 'Usuario'}
+            <div className="min-md:space-y-2 max-md:space-y-4">
+              <h2 className="text-2xl font-bold font-poppins custom-blue max-md:text-center">
+                Perfil Administrador
               </h2>
-              <p className="text-lg text-gray-800 font-semibold font-poppins dark:text-gray-300">
-                {user?.usuario?.nombre || ''} {user?.usuario?.apellido_p || ''}{' '}
-                {user?.usuario?.apellido_m || ''}
+              <p className="text-lg text-gray-800 font-semibold font-poppins">
+                {nombreCompleto || ""}
               </p>
-              <p className="text-base text-gray-600 font-poppins dark:text-gray-300">
-                {user?.usuario?.correo || ''}
+              <p className="text-base text-gray-600 font-poppins">
+                {email}
               </p>
-              <p className="text-base text-gray-600 font-poppins dark:text-gray-300">
-                {user?.usuario?.telefono || ''}
+              <p className="text-base text-gray-600 font-poppins">
+                Teléfono: {telefono}
               </p>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-between mt-6 space-y-4 md:space-y-0">
-              <button
-                onClick={handleEditModalToggle}
-                className="flex items-center hover:text-gray-800 hover:bg-gray-100 font-poppins rounded-lg text-base px-5 py-2.5"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
+            <div className="flex flex-col md:flex-row mt-6 min-md:justify-center min-md:items-center min-md:gap-2 w-full">
+                <button
+                  onClick={handleEditModalToggle}
+                  className="flex items-center gap-1 custom-blue bg-gray-100 hover:bg-gray-300 font-poppins rounded-lg text-base px-5 py-2.5 cursor-pointer max-md:justify-center"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                  />
-                </svg>
-                Editar Información
-              </button>
-              <button
-                onClick={handleChangePasswordModalToggle}
-                className="flex items-center hover:text-gray-800 hover:bg-gray-100 font-poppins rounded-lg text-base px-5 py-2.5"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
+                  <img src={Edit} alt="Editar" className="w-6 h-6" />
+                  Editar Información
+                </button>
+                <button
+                  onClick={handleOpenChangePasswordModal}
+                  className="flex items-center gap-1 custom-blue bg-gray-100 hover:bg-gray-300 font-poppins rounded-lg text-base px-5 py-2.5 cursor-pointer max-md:justify-center"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 14v3m-3-6V7a3 3 0 1 1 6 0v4m-8 0h10a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z"
-                  />
-                </svg>
-                Cambiar Contraseña
-              </button>
+                  <img src={Lock} alt="Cambiar Contraseña" className="w-6 h-6" />
+                  Cambiar Contraseña
+                </button>
             </div>
           </div>
         </div>
-      ) : isEditing ? (
-        <EditProfile
-          user={user}
-          onClose={onClose}
-          handleEditModalToggle={handleEditModalToggle}
-        />
-      ) : (
-        <EditPassword
-          user={user}
-          onClose={onClose}
-          handleChangePasswordModalToggle={handleChangePasswordModalToggle}
+      </div>
+
+      {showModalEdit && (
+        <EditInformation
+          // datosPersonales={datosPersonales}
+          showModalAdd={showModalEdit}
+          handleCerrarModalAdd={handleCerrarModalEdit}
         />
       )}
-    </div>
+
+      {showChangePasswordModal && (
+        <ChangePasswordModal
+          // datosPersonales={datosPersonales}
+          showModalAdd={showChangePasswordModal}
+          handleCerrarModalAdd={handleCloseChangePasswordModal}
+        />
+      )}
+    </>
   );
-};
+}
 
 export default ProfileModal;
