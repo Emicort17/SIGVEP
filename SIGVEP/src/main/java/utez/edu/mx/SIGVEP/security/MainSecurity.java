@@ -89,7 +89,7 @@ public class MainSecurity {
                         .requestMatchers(WHITE_LIST).permitAll()
                         .requestMatchers("/api/ventas/create", "/api/productos/", "/api/categorias/").hasAnyAuthority("ADMIN_ROLE","USER_ROLE")
                         .requestMatchers("/api/usuarios/**", "/api/productos/**","api/categorias/**", "api/ventas/**").hasAuthority("ADMIN_ROLE")
-
+                        .requestMatchers("/api/usuarios/cambiar-contrasena").authenticated()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

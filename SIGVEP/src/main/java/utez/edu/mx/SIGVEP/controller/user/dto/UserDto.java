@@ -1,5 +1,7 @@
 package utez.edu.mx.SIGVEP.controller.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import utez.edu.mx.SIGVEP.model.user.RoleBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
@@ -16,6 +18,7 @@ public class UserDto {
     private String apellido;
     private String telefono;
     private String email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String contrasena;
     private RoleBean role;
 
@@ -38,8 +41,8 @@ public class UserDto {
         usuario.setEmail(this.email);
         usuario.setPassword(this.contrasena);
         usuario.setRole(this.role);
-        usuario.setStatus(true); // Activo por defecto
-        usuario.setBlocked(false); // No bloqueado por defecto
+        usuario.setStatus(true);
+        usuario.setBlocked(false);
         return usuario;
     }
 }

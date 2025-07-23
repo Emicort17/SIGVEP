@@ -7,5 +7,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<UserBean, Integer> {
     Optional<UserBean> findByEmail(String email);
+    boolean existsByRoleName(String roleName);
+
 
 }

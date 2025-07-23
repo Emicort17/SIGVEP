@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.SIGVEP.config.ApiResponse;
+import utez.edu.mx.SIGVEP.controller.user.dto.ChangePasswordDto;
 import utez.edu.mx.SIGVEP.controller.user.dto.UserDto;
 import utez.edu.mx.SIGVEP.service.user.UserService;
 
@@ -108,4 +109,54 @@ public class UserController {
         }
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse> toggleStatus(@PathVariable Integer id) {
+        Optional<UserDto> usuarioActualizado = usuarioService.changeStatus(id);
+        ApiResponse response;
+
+        if (usuarioActualizado.isPresent()) {
+            response = new ApiResponse(usuarioActualizado.get(), HttpStatus.OK);
+        } else {
+            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado para cambiar status");
+        }
+
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @PatchMapping("/{id}/blocked")
+    public ResponseEntity<ApiResponse> toggleBlocked(@PathVariable Integer id) {
+        Optional<UserDto> usuarioActualizado = usuarioService.changeBlocked(id);
+        ApiResponse response;
+
+        if (usuarioActualizado.isPresent()) {
+            response = new ApiResponse(usuarioActualizado.get(), HttpStatus.OK);
+        } else {
+            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado para cambiar bloqueo");
+        }
+
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<ApiResponse> changePassword(@Valid @RequestBody ChangePasswordDto dto) {
+        ApiResponse response;
+
+        try {
+            boolean success = usuarioService.changePassword(dto);
+            if (success) {
+                response = new ApiResponse(HttpStatus.OK, false, "Contraseña actualizada correctamente");
+            } else {
+                response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado para cambiar la contraseña");
+            }
+        } catch (IllegalArgumentException e) {
+            response = new ApiResponse(HttpStatus.BAD_REQUEST, true, e.getMessage());
+        } catch (Exception e) {
+            response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, true, "Error al cambiar la contraseña");
+        }
+
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
 }
