@@ -6,16 +6,28 @@ import Close from "../../../assets/closeb.svg";
 import EditInformation from "./EditInformation";
 import ChangePasswordModal from "./ChangePasswordModal";
 
-function ProfileModal({ isOpen, onClose, user }) {
+function ProfileModal({ isOpen, onClose, user, onUserUpdate }) {
+
   if (!isOpen) return null;
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const apellidos = user?.apellido || "";
+  const [apellidoPaterno = "", apellidoMaterno = ""] = apellidos.split(" ");
 
-  const nombre = user?.nombre || "";
-  const apellido = user?.apellido || "";
+  const datosPersonales = {
+    nombre: user?.nombre || "",
+    apellidoPaterno,
+    apellidoMaterno,
+    telefono: user?.telefono || "",
+    email: user?.email || "",
+    id: user?.id_usuario || "",
+  };
+
+  const nombre = user?.nombre || "Usuario";
+  const apellido = user?.apellido || "Desconocido";
   const nombreCompleto = nombre + " " + apellido;
-  const telefono = user?.telefono || "";
-  const email = user?.email || "";
+  const telefono = user?.telefono || "No disponible";
+  const email = user?.email || "No disponible";
 
   const handleEditModalToggle = () => setShowModalEdit(true);
   const handleCerrarModalEdit = () => setShowModalEdit(false);
@@ -67,20 +79,20 @@ function ProfileModal({ isOpen, onClose, user }) {
             </div>
 
             <div className="flex flex-col md:flex-row mt-6 min-md:justify-center min-md:items-center min-md:gap-2 w-full">
-                <button
-                  onClick={handleEditModalToggle}
-                  className="flex items-center gap-1 custom-blue bg-gray-100 hover:bg-gray-300 font-poppins rounded-lg text-base px-5 py-2.5 cursor-pointer max-md:justify-center"
-                >
-                  <img src={Edit} alt="Editar" className="w-6 h-6" />
-                  Editar Información
-                </button>
-                <button
-                  onClick={handleOpenChangePasswordModal}
-                  className="flex items-center gap-1 custom-blue bg-gray-100 hover:bg-gray-300 font-poppins rounded-lg text-base px-5 py-2.5 cursor-pointer max-md:justify-center"
-                >
-                  <img src={Lock} alt="Cambiar Contraseña" className="w-6 h-6" />
-                  Cambiar Contraseña
-                </button>
+              <button
+                onClick={handleEditModalToggle}
+                className="flex items-center gap-1 custom-blue bg-gray-100 hover:bg-gray-300 font-poppins rounded-lg text-base px-5 py-2.5 cursor-pointer max-md:justify-center"
+              >
+                <img src={Edit} alt="Editar" className="w-6 h-6" />
+                Editar Información
+              </button>
+              <button
+                onClick={handleOpenChangePasswordModal}
+                className="flex items-center gap-1 custom-blue bg-gray-100 hover:bg-gray-300 font-poppins rounded-lg text-base px-5 py-2.5 cursor-pointer max-md:justify-center"
+              >
+                <img src={Lock} alt="Cambiar Contraseña" className="w-6 h-6" />
+                Cambiar Contraseña
+              </button>
             </div>
           </div>
         </div>
@@ -88,17 +100,23 @@ function ProfileModal({ isOpen, onClose, user }) {
 
       {showModalEdit && (
         <EditInformation
-          // datosPersonales={datosPersonales}
-          showModalAdd={showModalEdit}
-          handleCerrarModalAdd={handleCerrarModalEdit}
+          isOpen={showModalEdit}
+          onClose={handleCerrarModalEdit}
+          datosPersonales={datosPersonales}
+          onSuccess={(updatedUser) => {
+            if (onUserUpdate) onUserUpdate(updatedUser);
+          }}
         />
       )}
 
       {showChangePasswordModal && (
         <ChangePasswordModal
-          // datosPersonales={datosPersonales}
-          showModalAdd={showChangePasswordModal}
-          handleCerrarModalAdd={handleCloseChangePasswordModal}
+          isOpen={showChangePasswordModal}
+          onClose={handleCloseChangePasswordModal}
+          datosPersonales={datosPersonales}
+          onSuccess={(updatedUser) => {
+            if (onUserUpdate) onUserUpdate(updatedUser);
+          }}
         />
       )}
     </>

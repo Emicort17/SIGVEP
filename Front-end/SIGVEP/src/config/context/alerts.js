@@ -62,8 +62,8 @@ export const alertaCargando = (titulo, mensaje) => {
 };
 
 
-export const alertaPregunta = (titulo, mensaje, onConfirm, onCancel) => {
-    Swal.fire({
+export const alertaPregunta = (titulo, mensaje) => {
+    return Swal.fire({
         icon: 'question',
         title: titulo,
         text: mensaje,
@@ -75,15 +75,10 @@ export const alertaPregunta = (titulo, mensaje, onConfirm, onCancel) => {
         reverseButtons: true, 
         customClass: {
             popup: 'custom-alert-pregunta',
-            confirmButton: 'bg-custom-green text-white px-4 py-2 rounded ml-2', 
-            cancelButton: 'bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2', 
+            confirmButton: 'custom-blue-bottom hover:bg-blue-900 text-white px-4 py-2 rounded ml-2 cursor-pointer', 
+            cancelButton: 'bg-gray-100 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2 cursor-pointer', 
         }
     }).then((result) => {
-        if (result.isConfirmed) {
-            if (onConfirm) onConfirm(); 
-        } else if (result.isDismissed) {
-            if (onCancel) onCancel(); 
-        }
+        return result.isConfirmed;
     });
 };
-

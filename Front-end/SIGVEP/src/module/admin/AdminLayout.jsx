@@ -36,6 +36,7 @@ const AdminLayout = () => {
           user={userData}
           onClose={() => setIsProfileModalOpen(false)}
           isOpen={isProfileModalOpen}
+          onUserUpdate={setUserData}
         />
       )}
     </div>
