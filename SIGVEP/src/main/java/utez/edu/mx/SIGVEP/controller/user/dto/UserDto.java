@@ -20,6 +20,8 @@ public class UserDto {
     private String email;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String contrasena;
+    private Boolean status;
+    private Boolean blocked;
     private RoleBean role;
 
     public UserDto(UserBean usuarioEntity) {
@@ -29,6 +31,8 @@ public class UserDto {
         this.telefono = usuarioEntity.getTelephone();
         this.email = usuarioEntity.getEmail();
         this.contrasena = usuarioEntity.getPassword();
+        this.status = usuarioEntity.getStatus();
+        this.blocked = usuarioEntity.getBlocked();
         this.role = usuarioEntity.getRole();
     }
 

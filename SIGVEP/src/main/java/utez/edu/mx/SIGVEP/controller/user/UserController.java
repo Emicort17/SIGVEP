@@ -97,7 +97,7 @@ public class UserController {
 
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse> cambiarEstadoUsuario(@PathVariable Integer id) {
         Optional<UserDto> usuarioActualizado = usuarioService.patch(id);
         ApiResponse response;
@@ -111,19 +111,6 @@ public class UserController {
     }
 
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<ApiResponse> toggleStatus(@PathVariable Integer id) {
-        Optional<UserDto> usuarioActualizado = usuarioService.changeStatus(id);
-        ApiResponse response;
-
-        if (usuarioActualizado.isPresent()) {
-            response = new ApiResponse(usuarioActualizado.get(), HttpStatus.OK);
-        } else {
-            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado para cambiar status");
-        }
-
-        return new ResponseEntity<>(response, response.getStatus());
-    }
 
     @PatchMapping("/{id}/blocked")
     public ResponseEntity<ApiResponse> toggleBlocked(@PathVariable Integer id) {

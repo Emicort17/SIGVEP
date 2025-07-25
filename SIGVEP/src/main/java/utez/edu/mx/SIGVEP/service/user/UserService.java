@@ -207,6 +207,8 @@ public class UserService {
                 .telefono(usuario.getTelephone())
                 .email(usuario.getEmail())
                 .contrasena(usuario.getPassword())
+                .status(usuario.getStatus())
+                .blocked(usuario.getBlocked())
                 .role(usuario.getRole())
                 .build();
     }
