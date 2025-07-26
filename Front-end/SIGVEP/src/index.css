@@ -146,3 +146,88 @@ body,
 .custom-blue-bottom:hover {
   background-color: #192d69;
 }
+
+.custom-datatable .p-datatable-thead > tr > th {
+  background: #1E3A8A !important;
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.custom-datatable .p-datatable-wrapper {
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.08);
+}
+
+.custom-datatable .p-datatable-tbody > tr > td {
+  font-size: 15px;
+  border: none;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.custom-datatable .p-datatable-tbody > tr:hover {
+  background: #f1f5f9;
+}
+
+.custom-datatable .p-paginator {
+  background: transparent;
+  border: none;
+  margin-top: 8px;
+}
+.custom-datatable .p-paginator .p-paginator-page {
+  border-radius: 50%;
+  margin: 0 2px;
+  color: #1E3A8A;
+  font-weight: 400;
+}
+.custom-datatable .p-paginator .p-paginator-page.p-highlight {
+  background: #1E3A8A;
+  color: #fff;
+}
+.custom-datatable .p-paginator .p-paginator-page:hover {
+  background: #1E3A8A22;
+  color: #1E3A8A;
+}
+
+input[type="text"].search-input {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 15px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.btn-edit-action {
+  background: #1E3A8A;
+  border-radius: 9999px;
+  padding: 11px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.btn-edit-action:hover {
+  background: #f3f4f6; 
+}
+
+.btn-edit-action .icon-default {
+  display: block;
+}
+.btn-edit-action .icon-hover {
+  display: none;
+}
+.btn-edit-action:hover .icon-default {
+  display: none;
+}
+.btn-edit-action:hover .icon-hover {
+  display: block;
+}
