@@ -1,82 +1,174 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-
-const mockUsers = Array.from({ length: 12 }).map((_, i) => ({
-  id: i + 1,
-  nombre: 'Victor Alejandro Oliva Quiroz',
-  correo: 'victor.alejandro@gmail.com',
-  telefono: '7772693860',
-  estatus: i % 3 === 0 ? 'Deshabilitado' : 'Habilitado',
-}));
-
-const statusBodyTemplate = (rowData) => (
-  <span className={
-    rowData.estatus === 'Habilitado'
-      ? 'bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold'
-      : 'bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold'
-  }>
-    {rowData.estatus}
-  </span>
-);
-
-const actionBodyTemplate = () => (
-  <button className="bg-custom-blue hover:bg-blue-900 text-white p-2 rounded-full transition">
-    Editar
-  </button>
-);
-
-const rowNumberTemplate = (rowData, { rowIndex }) => (
-  <span>{rowIndex + 1}</span>
-);
+import Add from '../../assets/addw.svg';
+import Edit from '../../assets/edit1.svg';
+import EditW from '../../assets/editw.svg';
+import Search from '../../assets/search1.svg';
+import { AxiosClient } from '../../config/http-gateway/http-client';
+import NewUserModal from './components/NewUserModal';
+import EditUserInformationModal from './components/EditUserInformationModal';
+import { alertaCargando, alertaError, alertaPregunta, alertaExito } from '../../config/context/alerts';
 
 function Users() {
   const [search, setSearch] = useState('');
   const [first, setFirst] = useState(0);
-  const rows = 6;
+  const [user, setUsers] = useState([]);
+  const [showNewUserModal, setShowNewUserModal] = useState(false);
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [editUserData, setEditUserData] = useState(null);
+  const rows = 8;
 
-  const filteredUsers = mockUsers.filter(
-    (u) =>
-      u.nombre.toLowerCase().includes(search.toLowerCase()) ||
-      u.correo.toLowerCase().includes(search.toLowerCase()) ||
-      u.telefono.includes(search)
+  const fetchUsers = async () => {
+    try {
+      const response = await AxiosClient.get('/usuarios');
+      const filtered = response.data?.filter(
+        u => u.role?.name === "USER_ROLE"
+      ) || [];
+      setUsers(filtered);
+    } catch (error) {
+      setUsers([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const rowNumberTemplate = (rowData, { rowIndex }) => (
+    <span>{rowIndex + 1}</span>
+  );
+
+  const actionBodyTemplate = (rowData) => (
+    <button
+      className="btn-edit-action group"
+      onClick={() => {
+        setEditUserData(rowData);
+        setShowEditUserModal(true);
+      }}
+      title="Editar"
+    >
+      <img src={EditW} alt="Editar" className="icon-default w-4 h-4" />
+      <img src={Edit} alt="Editar" className="icon-hover w-4 h-4" />
+    </button>
+  );
+
+  const statusBodyTemplate = (rowData) => {
+    const handleStatusChange = async () => {
+      const nuevoStatus = !rowData.status;
+      const pregunta = rowData.status
+        ? "¿Deseas desactivar este usuario?"
+        : "¿Deseas activar este usuario?";
+      const confirm = await alertaPregunta(pregunta, "Esta acción cambiará el estado del usuario.");
+      if (!confirm) return;
+      alertaCargando("Actualizando estatus...", "Por favor, espere");
+      try {
+        await AxiosClient.patch(`/usuarios/${rowData.id_usuario}/status`, { status: nuevoStatus });
+        alertaExito("Éxito", "El estatus del usuario se actualizó correctamente.");
+        fetchUsers();
+      } catch (error) {
+        alertaError("Error", "No se pudo actualizar el estatus.");
+        console.error("A chinga fallo por esto ", error)
+      }
+    };
+
+    return (
+      <span
+        className={
+          rowData.status
+            ? 'text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-2 py-2 text-center me-2 mb-2 cursor-pointer'
+            : 'text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-2 py-2 text-center me-2 mb-2 cursor-pointer'
+        }
+        onClick={handleStatusChange}
+        style={{ userSelect: 'none' }}
+        title={rowData.status ? "Deshabilitar usuario" : "Habilitar usuario"}
+      >
+        {rowData.status ? 'Habilitado' : 'Deshabilitado'}
+      </span>
+    );
+  };
+
+  const filteredUsers = user.filter((u) =>
+    `${u.nombre || ''} ${u.apellido || ''}`.toLowerCase().includes(search.toLowerCase()) ||
+    (u.correo || '').toLowerCase().includes(search.toLowerCase()) ||
+    (u.telefono || '').includes(search)
+  );
+
+  const fullNameBodyTemplate = (rowData) => (
+    <span>
+      {rowData.nombre || ''} {rowData.apellido || ''}
+    </span>
   );
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-        <h1 className="text-2xl font-bold">Usuarios</h1>
-        <button className="flex items-center gap-2 bg-custom-blue text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-900 transition text-sm">
-          Nuevo Usuario
-        </button>
+    <div className="flex flex-col flex-1 w-full h-full">
+      <div className="w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+          <h1 className="text-2xl font-bold">Usuarios</h1>
+          <button
+            className="custom-blue-bottom text-white py-2 px-4 rounded-lg hover:bg-blue-900 transition cursor-pointer flex items-center gap-2 justify-center "
+            onClick={() => setShowNewUserModal(true)}
+          >
+            <img src={Add} alt="Agregar" className="w-5" />
+            Nuevo Usuario
+          </button>
+        </div>
+        <div className="mb-7 relative w-full">
+          <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <img src={Search} alt="Buscar" className="w-4 h-4" />
+          </span>
+          <input
+            type="text"
+            placeholder="Buscar usuario..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setFirst(0); }}
+            className="search-input"
+            style={{ paddingLeft: '2rem' }}
+          />
+        </div>
+        <div className="overflow-x-auto rounded-lg shadow bg-white">
+          <DataTable
+            value={filteredUsers}
+            paginator
+            rows={rows}
+            first={first}
+            onPage={e => setFirst(e.first)}
+            className="custom-datatable"
+            emptyMessage={<span className="text-gray-500">No hay usuarios</span>}
+          >
+            <Column body={rowNumberTemplate} header="#" style={{ width: '40px' }} />
+            <Column body={fullNameBodyTemplate} header="Nombre Completo" style={{ minWidth: '200px' }} />
+            <Column field="email" header="Correo Electrónico" style={{ minWidth: '200px' }} />
+            <Column field="telefono" header="Teléfono" style={{ minWidth: '120px' }} />
+            <Column field="status" header="Estatus" body={statusBodyTemplate} style={{ minWidth: '120px', }} />
+            <Column header="Acción" body={actionBodyTemplate} style={{ minWidth: '100px', textAlign: 'center' }} />
+          </DataTable>
+        </div>
       </div>
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Buscar usuario..."
-          value={search}
-          onChange={e => { setSearch(e.target.value); setFirst(0); }}
-          className="w-full sm:w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+      {showNewUserModal && (
+        <NewUserModal
+          isOpen={showNewUserModal}
+          onClose={() => setShowNewUserModal(false)}
+          onSuccess={() => {
+            setShowNewUserModal(false);
+            fetchUsers();
+            setSearch('');
+          }}
         />
-      </div>
-      <div className="overflow-x-auto rounded-lg shadow">
-        <DataTable
-          value={filteredUsers}
-          paginator
-          rows={rows}
-          first={first}
-          onPage={e => setFirst(e.first)}
-          className="custom-datatable"
-          emptyMessage={<span className="text-gray-500">No hay usuarios</span>}
-        >
-          <Column body={rowNumberTemplate} header="#" style={{ width: '40px' }}></Column>
-          <Column field="nombre" header="Nombre Completo" style={{ minWidth: '200px' }}></Column>
-          <Column field="correo" header="Correo Electrónico" style={{ minWidth: '200px' }}></Column>
-          <Column field="telefono" header="Teléfono" style={{ minWidth: '120px' }}></Column>
-          <Column field="estatus" header="Estatus" body={statusBodyTemplate} style={{ minWidth: '120px' }}></Column>
-          <Column header="Acción" body={actionBodyTemplate} style={{ minWidth: '100px', textAlign: 'center' }}></Column>
-        </DataTable>
-      </div>
+      )}
+      {showEditUserModal && editUserData && (
+        <EditUserInformationModal
+          isOpen={showEditUserModal}
+          onClose={() => setShowEditUserModal(false)}
+          userData={editUserData}
+          onSuccess={() => {
+            setShowEditUserModal(false);
+            setEditUserData(null);
+            fetchUsers();
+            setSearch('');
+          }}
+        />
+      )}
     </div>
   );
 }

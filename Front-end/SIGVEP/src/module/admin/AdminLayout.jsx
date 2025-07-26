@@ -26,7 +26,7 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="h-screen">
       <Sidebar show={true} onProfileClick={handleProfileClick} isProfileActive={isProfileModalOpen} />
       <main className="min-h-screen max-md:p-6 md:pl-72 transition-all min-md:p-6 max-md:py-20">
         <Outlet />
