@@ -1,6 +1,8 @@
 package utez.edu.mx.SIGVEP.model.sale;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +35,8 @@ public class SaleBean {
 
    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
-    private UserBean user;
+    @JsonBackReference
+   private UserBean user;
 
     @ManyToMany
     @JoinTable(

@@ -21,17 +21,10 @@ public class SaleDto {
     private Date date;
     private int total_sale;
     private Boolean status;
-    private UserBean user;
-    private List<ProductBean> products;
+    private Integer userId;
+    private List<Integer> productIds;
 
-    public SaleDto(SaleBean saleEntity) {
-        this.id_venta =  saleEntity.getId_venta();
-        this.date = saleEntity.getDate();
-        this.total_sale = saleEntity.getTotal_sale();
-        this.status = saleEntity.getStatus();
-        this.user = saleEntity.getUser();
-        this.products = saleEntity.getProducts();
-    }
+
 
     public SaleBean toEntity() {
         SaleBean saleEntity = new SaleBean();

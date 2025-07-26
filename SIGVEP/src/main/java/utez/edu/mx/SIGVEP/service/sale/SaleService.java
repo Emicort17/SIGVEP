@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleDto;
+import utez.edu.mx.SIGVEP.model.product.ProductBean;
+import utez.edu.mx.SIGVEP.model.product.ProductRepository;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
 import utez.edu.mx.SIGVEP.model.sale.SaleRepository;
+import utez.edu.mx.SIGVEP.model.user.UserBean;
+import utez.edu.mx.SIGVEP.model.user.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +24,13 @@ public class SaleService {
 
     @Autowired
     private SaleRepository saleDao;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
 
     @Transactional(readOnly = true)
     public List<SaleDto> getAllSales() {
@@ -83,10 +94,28 @@ public class SaleService {
         if (saleDto.getStatus() != null) {
             sale.setStatus(saleDto.getStatus());
         } else if (isNew) {
-            sale.setStatus(true); // Valor por defecto
+            sale.setStatus(true);
         }
 
-        logger.info("Datos de venta configurados: {}", sale);
+        // Buscar y setear el usuario
+        if (saleDto.getUserId() != null) {
+            UserBean user = userRepository.findById(saleDto.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            sale.setUser(user);
+        } else {
+            throw new RuntimeException("El ID del usuario es obligatorio.");
+        }
+
+        // Buscar y setear los productos
+        if (saleDto.getProductIds() != null && !saleDto.getProductIds().isEmpty()) {
+            List<ProductBean> products = saleDto.getProductIds().stream()
+                    .map(id -> productRepository.findById(id)
+                            .orElseThrow(() -> new RuntimeException("Producto con ID " + id + " no encontrado")))
+                    .collect(Collectors.toList());
+            sale.setProducts(products);
+        } else {
+            throw new RuntimeException("Debes proporcionar al menos un producto.");
+        }
     }
 
     private SaleDto toDTO(SaleBean sale) {
@@ -95,6 +124,9 @@ public class SaleService {
                 .date(sale.getDate())
                 .total_sale(sale.getTotal_sale())
                 .status(sale.getStatus())
+                .userId(sale.getUser().getId())
+                .productIds(sale.getProducts().stream().map(ProductBean::getId_product).collect(Collectors.toList()))
                 .build();
     }
+
 }
