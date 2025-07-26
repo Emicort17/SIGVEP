@@ -17,14 +17,12 @@ public class CategoryDto {
     private Integer id_category;
     private String name, description;
     private Boolean status;
-    private Set<ProductBean> products;
 
     public CategoryDto(CategoryBean categoryEntity){
         this.id_category = categoryEntity.getId_category();
         this.name = categoryEntity.getName();
         this.description = categoryEntity.getDescription();
         this.status = categoryEntity.getStatus();
-        this.products = categoryEntity.getProducts();
     }
 
     public CategoryBean toEntity() {
@@ -33,7 +31,6 @@ public class CategoryDto {
         categoryEntity.setName(this.name);
         categoryEntity.setDescription(this.description);
         categoryEntity.setStatus(true);
-        categoryEntity.setProducts(this.products);
         return categoryEntity;
     }
 

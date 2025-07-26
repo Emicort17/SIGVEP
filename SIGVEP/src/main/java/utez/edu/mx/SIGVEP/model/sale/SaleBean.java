@@ -32,6 +32,11 @@ public class SaleBean {
     @Column(name = "status", columnDefinition = "BOOL DEFAULT true")
     private Boolean status;
 
+    @Column(name = "tipo_pago", nullable = false)
+    private String payment_type;
+
+    @Column(name = "cantidad_productos", nullable = false)
+    private Integer quantity_products;
 
    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)

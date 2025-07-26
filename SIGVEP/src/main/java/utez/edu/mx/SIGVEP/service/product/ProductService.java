@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.SIGVEP.controller.product.dto.ProductDto;
+import utez.edu.mx.SIGVEP.model.category.CategoryRepository;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.product.ProductRepository;
 
@@ -23,8 +24,12 @@ public class ProductService {
     @Autowired
     private final ProductRepository productDao;
 
-    public ProductService(ProductRepository productDao) {
+    @Autowired
+    private final CategoryRepository categoryRepository;
+
+    public ProductService(ProductRepository productDao, CategoryRepository categoryRepository) {
         this.productDao = productDao;
+        this.categoryRepository = categoryRepository;
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +91,12 @@ public class ProductService {
         productBean.setName(productDto.getName());
         productBean.setUnit_price(productDto.getUnit_price());
         productBean.setStock(productDto.getStock());
-        productBean.setCategory(productDto.getCategory());
+        if (productDto.getCategory() != null && productDto.getCategory().getId_category() != null) {
+            productBean.setCategory(categoryRepository.findById(productDto.getCategory().getId_category())
+                    .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada")));
+        } else {
+            throw new IllegalArgumentException("La categoría es obligatoria");
+        }
         if(isNew){
             productBean.setStatus(true);
         }

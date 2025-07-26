@@ -23,7 +23,7 @@ public class ProductDto {
         this.unit_price = productEntity.getUnit_price();
         this.stock = productEntity.getStock();
         this.status = productEntity.getStatus();
-        this.category = new CategoryBean();
+        this.category = productEntity.getCategory();
     }
 
     public ProductBean toEntity(){

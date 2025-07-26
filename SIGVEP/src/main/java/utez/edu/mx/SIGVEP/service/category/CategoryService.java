@@ -79,7 +79,6 @@ public class CategoryService {
                 .name(categoryBean.getName())
                 .description(categoryBean.getDescription())
                 .status(categoryBean.getStatus())
-                .products(categoryBean.getProducts())
                 .build();
     }
 
@@ -87,7 +86,6 @@ public class CategoryService {
         logger.info("Registrando categoria...");
         categoryBean.setName(categoryDto.getName());
         categoryBean.setDescription(categoryDto.getDescription());
-        categoryBean.setProducts(categoryDto.getProducts());
         if(isNew){
             categoryBean.setStatus(true);
         }

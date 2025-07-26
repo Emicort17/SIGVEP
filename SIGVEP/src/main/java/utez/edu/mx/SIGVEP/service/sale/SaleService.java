@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleDto;
+import utez.edu.mx.SIGVEP.controller.sale.dto.SaleNewDto;
+import utez.edu.mx.SIGVEP.controller.user.dto.UserDto;
+import utez.edu.mx.SIGVEP.controller.user.dto.UserPublicDto;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.product.ProductRepository;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
@@ -45,28 +48,30 @@ public class SaleService {
     }
 
     @Transactional
-    public SaleDto saveSale(SaleDto saleDto) {
+    public SaleNewDto saveSale(SaleDto saleDto) {
         logger.info("Guardando nueva venta con fecha: {}", saleDto.getDate());
 
         SaleBean sale = new SaleBean();
-        setSaleData(sale, saleDto, true);
+        SaleNewDto saleNewDto = new SaleNewDto();
+        setSaleData(sale, saleDto, saleNewDto,true);
         SaleBean savedSale = saleDao.save(sale);
 
         logger.info("Venta guardada con ID: {}", savedSale.getId_venta());
-        return toDTO(savedSale);
+        return saleNewDto;
     }
 
     @Transactional
-    public Optional<SaleDto> updateSale(Integer id, SaleDto saleDto) {
+    public Optional<SaleNewDto> updateSale(Integer id, SaleDto saleDto) {
         logger.info("Actualizando venta con ID: {}", id);
 
         Optional<SaleBean> existingSale = saleDao.findById(id);
         if (existingSale.isPresent()) {
             SaleBean sale = existingSale.get();
-            setSaleData(sale, saleDto, false);
+            SaleNewDto saleNewDto = new SaleNewDto();
+            setSaleData(sale, saleDto, saleNewDto, false);
             saleDao.save(sale);
             logger.info("Venta actualizada correctamente.");
-            return Optional.of(toDTO(sale));
+            return Optional.of(toNewDTO(sale));
         } else {
             logger.warn("Venta con ID {} no encontrada", id);
             return Optional.empty();
@@ -87,14 +92,23 @@ public class SaleService {
         return false;
     }
 
-    private void setSaleData(SaleBean sale, SaleDto saleDto, boolean isNew) {
+    private void setSaleData(SaleBean sale, SaleDto saleDto, SaleNewDto saleNewDto, boolean isNew) {
         sale.setDate(saleDto.getDate());
         sale.setTotal_sale(saleDto.getTotal_sale());
+        sale.setQuantity_products(saleDto.getProductIds().size());
+        sale.setPayment_type(saleDto.getPayment_type());
+
+        saleNewDto.setDate(saleDto.getDate());
+        saleNewDto.setTotal_sale(saleDto.getTotal_sale());
+        saleNewDto.setQuantity_products(saleDto.getProductIds().size());
+        saleNewDto.setPayment_type(saleDto.getPayment_type());
 
         if (saleDto.getStatus() != null) {
             sale.setStatus(saleDto.getStatus());
+            saleNewDto.setStatus(saleDto.getStatus());
         } else if (isNew) {
             sale.setStatus(true);
+            saleNewDto.setStatus(true);
         }
 
         // Buscar y setear el usuario
@@ -102,6 +116,8 @@ public class SaleService {
             UserBean user = userRepository.findById(saleDto.getUserId())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
             sale.setUser(user);
+            UserPublicDto userPublicDto = toPublicDto(user);
+            saleNewDto.setUser(userPublicDto);
         } else {
             throw new RuntimeException("El ID del usuario es obligatorio.");
         }
@@ -113,6 +129,7 @@ public class SaleService {
                             .orElseThrow(() -> new RuntimeException("Producto con ID " + id + " no encontrado")))
                     .collect(Collectors.toList());
             sale.setProducts(products);
+            saleNewDto.setProducts(products);
         } else {
             throw new RuntimeException("Debes proporcionar al menos un producto.");
         }
@@ -129,4 +146,22 @@ public class SaleService {
                 .build();
     }
 
+    private SaleNewDto toNewDTO(SaleBean sale) {
+        return SaleNewDto.builder()
+                .id_venta(sale.getId_venta())
+                .date(sale.getDate())
+                .total_sale(sale.getTotal_sale())
+                .status(sale.getStatus())
+                .user(toPublicDto(sale.getUser()))
+                .products(sale.getProducts())
+                .build();
+    }
+
+    public UserPublicDto toPublicDto(UserBean userDto) {
+        return UserPublicDto.builder()
+                .id_usuario(userDto.getId())
+                .nombre(userDto.getName())
+                .apellido(userDto.getSurname())
+                .build();
+    }
 }

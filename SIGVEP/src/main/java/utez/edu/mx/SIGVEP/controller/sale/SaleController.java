@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.SIGVEP.config.ApiResponse;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleDto;
+import utez.edu.mx.SIGVEP.controller.sale.dto.SaleNewDto;
 import utez.edu.mx.SIGVEP.service.sale.SaleService;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class SaleController {
     public ResponseEntity<ApiResponse> createSale(@Valid @RequestBody SaleDto saleDto) {
         ApiResponse response;
         try {
-            SaleDto createdSale = saleService.saveSale(saleDto);
+            SaleNewDto createdSale = saleService.saveSale(saleDto);
             response = new ApiResponse(createdSale, HttpStatus.CREATED);
         } catch (Exception e) {
             response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, true, "Error al crear la venta");
@@ -59,7 +60,7 @@ public class SaleController {
     // Actualizar venta
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateSale(@PathVariable Integer id, @Valid @RequestBody SaleDto saleDto) {
-        Optional<SaleDto> updatedSale = saleService.updateSale(id, saleDto);
+        Optional<SaleNewDto> updatedSale = saleService.updateSale(id, saleDto);
         ApiResponse response;
 
         if (updatedSale.isPresent()) {

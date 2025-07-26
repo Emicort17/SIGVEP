@@ -1,8 +1,7 @@
 package utez.edu.mx.SIGVEP.controller.sale.dto;
 
-
-import jakarta.persistence.Column;
 import lombok.*;
+import utez.edu.mx.SIGVEP.controller.user.dto.UserPublicDto;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
@@ -15,16 +14,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleDto {
-
+public class SaleNewDto {
     private Integer id_venta;
     private Date date;
     private int total_sale;
     private Boolean status;
-    private Integer userId;
-    private List<Integer> productIds;
+    private UserPublicDto user;
+    private List<ProductBean> products;
+    private Integer quantity_products;
     private String payment_type;
-
 
     public SaleBean toEntity() {
         SaleBean saleEntity = new SaleBean();
@@ -32,7 +30,7 @@ public class SaleDto {
         saleEntity.setDate(date);
         saleEntity.setTotal_sale(total_sale);
         saleEntity.setStatus(status);
+        saleEntity.setProducts(products);
         return saleEntity;
     }
-
 }
