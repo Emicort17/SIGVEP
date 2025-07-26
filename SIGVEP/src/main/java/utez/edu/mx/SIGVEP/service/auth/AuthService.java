@@ -81,7 +81,7 @@ public class AuthService {
             logger.info("Generando token JWT para el usuario: {}", usuario);
             String token = provider.generateToken(auth);
 
-            SimpleUserDto simpleUser = new SimpleUserDto(user.getId_usuario(), user.getRole().getName());
+            SimpleUserDto simpleUser = new SimpleUserDto(user.getId(), user.getRole().getName());
 
             SignedDto signedDto = new SignedDto(token, "Bearer", simpleUser);
 

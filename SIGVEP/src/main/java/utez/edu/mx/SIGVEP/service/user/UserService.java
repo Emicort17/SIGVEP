@@ -41,7 +41,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsuarios() {
-        return usuarioDao.findAll().stream()
+        return usuarioDao.findAllByOrderByIdAsc().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -201,7 +201,7 @@ public class UserService {
 
     private UserDto toDTO(UserBean usuario) {
         return UserDto.builder()
-                .id_usuario(usuario.getId_usuario())
+                .id_usuario(usuario.getId())
                 .nombre(usuario.getName())
                 .apellido(usuario.getSurname())
                 .telefono(usuario.getTelephone())

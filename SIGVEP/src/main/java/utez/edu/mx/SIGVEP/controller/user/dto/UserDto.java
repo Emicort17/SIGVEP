@@ -25,7 +25,7 @@ public class UserDto {
     private RoleBean role;
 
     public UserDto(UserBean usuarioEntity) {
-        this.id_usuario = usuarioEntity.getId_usuario();
+        this.id_usuario = usuarioEntity.getId();
         this.nombre = usuarioEntity.getName();
         this.apellido = usuarioEntity.getSurname();
         this.telefono = usuarioEntity.getTelephone();
@@ -38,7 +38,7 @@ public class UserDto {
 
     public UserBean toEntity() {
         UserBean usuario = new UserBean();
-        usuario.setId_usuario(this.id_usuario);
+        usuario.setId(this.id_usuario);
         usuario.setName(this.nombre);
         usuario.setSurname(this.apellido);
         usuario.setTelephone(this.telefono);

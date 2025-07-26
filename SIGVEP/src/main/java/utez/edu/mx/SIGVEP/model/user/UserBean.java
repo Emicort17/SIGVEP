@@ -16,7 +16,7 @@ import java.util.Set;
 public class UserBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_usuario;
+    private Integer id;
 
     @Column(name = "nombre", nullable = false, columnDefinition = "VARCHAR(30)")
     private String name;
@@ -51,12 +51,12 @@ public class UserBean {
     @JoinColumn(name = "passToken_id", referencedColumnName = "id")
     private PasswordResetToken token;
 
-    public Integer getId_usuario() {
-        return id_usuario;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId_usuario(Integer id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -156,8 +156,8 @@ public class UserBean {
     }
 
 
-    public UserBean(Integer id_usuario, String name, String surname, String telephone, String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
-        this.id_usuario = id_usuario;
+    public UserBean(Integer id, String name, String surname, String telephone, String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.telephone = telephone;
