@@ -5,14 +5,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import utez.edu.mx.SIGVEP.controller.product.dto.ProductQuantityDto;
+import utez.edu.mx.SIGVEP.controller.product.dto.ProductQuantityNewDto;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleDto;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleNewDto;
-import utez.edu.mx.SIGVEP.controller.user.dto.UserDto;
 import utez.edu.mx.SIGVEP.controller.user.dto.UserPublicDto;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.product.ProductRepository;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
 import utez.edu.mx.SIGVEP.model.sale.SaleRepository;
+import utez.edu.mx.SIGVEP.model.saleproduct.SaleProductBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
 import utez.edu.mx.SIGVEP.model.user.UserRepository;
 
@@ -36,42 +38,40 @@ public class SaleService {
 
 
     @Transactional(readOnly = true)
-    public List<SaleDto> getAllSales() {
+    public List<SaleNewDto> getAllSales() {
         return saleDao.findAll().stream()
-                .map(this::toDTO)
+                .map(this::toNewDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Optional<SaleDto> getSaleById(Integer id) {
-        return saleDao.findById(id).map(this::toDTO);
+    public Optional<SaleNewDto> getSaleById(Integer id) {
+        return saleDao.findById(id).map(this::toNewDTO);
     }
 
     @Transactional
-    public SaleNewDto saveSale(SaleDto saleDto) {
+    public SaleDto saveSale(SaleDto saleDto) {
         logger.info("Guardando nueva venta con fecha: {}", saleDto.getDate());
 
         SaleBean sale = new SaleBean();
-        SaleNewDto saleNewDto = new SaleNewDto();
-        setSaleData(sale, saleDto, saleNewDto,true);
+        setSaleData(sale, saleDto, true);
         SaleBean savedSale = saleDao.save(sale);
 
         logger.info("Venta guardada con ID: {}", savedSale.getId_venta());
-        return saleNewDto;
+        return toDTO(savedSale);
     }
 
     @Transactional
-    public Optional<SaleNewDto> updateSale(Integer id, SaleDto saleDto) {
+    public Optional<SaleDto> updateSale(Integer id, SaleDto saleDto) {
         logger.info("Actualizando venta con ID: {}", id);
 
         Optional<SaleBean> existingSale = saleDao.findById(id);
         if (existingSale.isPresent()) {
             SaleBean sale = existingSale.get();
-            SaleNewDto saleNewDto = new SaleNewDto();
-            setSaleData(sale, saleDto, saleNewDto, false);
+            setSaleData(sale, saleDto, false);
             saleDao.save(sale);
             logger.info("Venta actualizada correctamente.");
-            return Optional.of(toNewDTO(sale));
+            return Optional.of(toDTO(sale));
         } else {
             logger.warn("Venta con ID {} no encontrada", id);
             return Optional.empty();
@@ -92,23 +92,20 @@ public class SaleService {
         return false;
     }
 
-    private void setSaleData(SaleBean sale, SaleDto saleDto, SaleNewDto saleNewDto, boolean isNew) {
+    private void setSaleData(SaleBean sale, SaleDto saleDto, boolean isNew) {
         sale.setDate(saleDto.getDate());
-        sale.setTotal_sale(saleDto.getTotal_sale());
-        sale.setQuantity_products(saleDto.getProductIds().size());
+        sale.setTotal_sale(
+                saleDto.getProducts().stream()
+                .mapToDouble(productQuantity -> productQuantity.getQuantity() * productRepository.findById(productQuantity.getProductId())
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productQuantity.getProductId()))
+                        .getUnit_price())
+                .sum());
         sale.setPayment_type(saleDto.getPayment_type());
-
-        saleNewDto.setDate(saleDto.getDate());
-        saleNewDto.setTotal_sale(saleDto.getTotal_sale());
-        saleNewDto.setQuantity_products(saleDto.getProductIds().size());
-        saleNewDto.setPayment_type(saleDto.getPayment_type());
 
         if (saleDto.getStatus() != null) {
             sale.setStatus(saleDto.getStatus());
-            saleNewDto.setStatus(saleDto.getStatus());
         } else if (isNew) {
             sale.setStatus(true);
-            saleNewDto.setStatus(true);
         }
 
         // Buscar y setear el usuario
@@ -116,20 +113,38 @@ public class SaleService {
             UserBean user = userRepository.findById(saleDto.getUserId())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
             sale.setUser(user);
-            UserPublicDto userPublicDto = toPublicDto(user);
-            saleNewDto.setUser(userPublicDto);
         } else {
             throw new RuntimeException("El ID del usuario es obligatorio.");
         }
 
-        // Buscar y setear los productos
-        if (saleDto.getProductIds() != null && !saleDto.getProductIds().isEmpty()) {
-            List<ProductBean> products = saleDto.getProductIds().stream()
-                    .map(id -> productRepository.findById(id)
-                            .orElseThrow(() -> new RuntimeException("Producto con ID " + id + " no encontrado")))
+        // Limpiar productos previos si es actualización
+        if (!isNew && sale.getSaleProducts() != null) {
+            sale.getSaleProducts().clear();
+        }
+
+        // Crear y asociar SaleProductBean
+        if (saleDto.getProducts() != null && !saleDto.getProducts().isEmpty()) {
+            List<SaleProductBean> saleProducts = saleDto.getProducts().stream()
+                    .map(productQuantity -> {
+                        ProductBean product = productRepository.findById(productQuantity.getProductId())
+                                .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productQuantity.getProductId()));
+                        if (product.getStock() < productQuantity.getQuantity()) {
+                            throw new RuntimeException("Stock insuficiente para el producto: " + product.getName());
+                        }
+                        product.setStock(product.getStock() - productQuantity.getQuantity());
+                        productRepository.save(product);
+
+                        return utez.edu.mx.SIGVEP.model.saleproduct.SaleProductBean.builder()
+                                .sale(sale)
+                                .product(product)
+                                .quantity(productQuantity.getQuantity())
+                                .build();
+                    })
                     .collect(Collectors.toList());
-            sale.setProducts(products);
-            saleNewDto.setProducts(products);
+            sale.getSaleProducts().addAll(saleProducts);
+            sale.setQuantity_products(saleProducts.stream()
+                    .mapToInt(sp -> sp.getQuantity().intValue())
+                    .sum());
         } else {
             throw new RuntimeException("Debes proporcionar al menos un producto.");
         }
@@ -142,7 +157,14 @@ public class SaleService {
                 .total_sale(sale.getTotal_sale())
                 .status(sale.getStatus())
                 .userId(sale.getUser().getId())
-                .productIds(sale.getProducts().stream().map(ProductBean::getId_product).collect(Collectors.toList()))
+                .products(sale.getSaleProducts().stream()
+                        .map(sp -> ProductQuantityDto.builder()
+                                .productId(sp.getProduct().getId_product())
+                                .quantity(sp.getQuantity())
+                                .build())
+                        .collect(Collectors.toList()))
+                .payment_type(sale.getPayment_type())
+                .quantity_products(sale.getQuantity_products())
                 .build();
     }
 
@@ -153,7 +175,14 @@ public class SaleService {
                 .total_sale(sale.getTotal_sale())
                 .status(sale.getStatus())
                 .user(toPublicDto(sale.getUser()))
-                .products(sale.getProducts())
+                .products(sale.getSaleProducts().stream()
+                        .map(sp -> ProductQuantityNewDto.builder()
+                                .product(sp.getProduct())
+                                .quantity(sp.getQuantity())
+                                .build())
+                        .collect(Collectors.toList()))
+                .payment_type(sale.getPayment_type())
+                .quantity_products(sale.getQuantity_products())
                 .build();
     }
 

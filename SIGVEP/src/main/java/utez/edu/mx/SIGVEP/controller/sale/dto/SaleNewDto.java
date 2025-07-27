@@ -1,6 +1,7 @@
 package utez.edu.mx.SIGVEP.controller.sale.dto;
 
 import lombok.*;
+import utez.edu.mx.SIGVEP.controller.product.dto.ProductQuantityNewDto;
 import utez.edu.mx.SIGVEP.controller.user.dto.UserPublicDto;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
@@ -8,6 +9,7 @@ import utez.edu.mx.SIGVEP.model.user.UserBean;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -17,10 +19,10 @@ import java.util.List;
 public class SaleNewDto {
     private Integer id_venta;
     private Date date;
-    private int total_sale;
+    private double total_sale;
     private Boolean status;
     private UserPublicDto user;
-    private List<ProductBean> products;
+    private List<ProductQuantityNewDto> products;
     private Integer quantity_products;
     private String payment_type;
 
@@ -30,7 +32,6 @@ public class SaleNewDto {
         saleEntity.setDate(date);
         saleEntity.setTotal_sale(total_sale);
         saleEntity.setStatus(status);
-        saleEntity.setProducts(products);
         return saleEntity;
     }
 }

@@ -1,10 +1,12 @@
 package utez.edu.mx.SIGVEP.model.product;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import utez.edu.mx.SIGVEP.model.category.CategoryBean;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
+import utez.edu.mx.SIGVEP.model.saleproduct.SaleProductBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder(builderClassName = "Builder", toBuilder = true)
 @ToString
+@Getter
+@Setter
 public class ProductBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,55 +41,7 @@ public class ProductBean {
     @JoinColumn(name = "id_category")
     private CategoryBean category;
 
-    public CategoryBean getCategory() {
-        return category;
-    }
-
-    public void setCategory(CategoryBean category) {
-        this.category = category;
-    }
-
-    public Double getUnit_price() {
-        return unit_price;
-    }
-
-    public void setUnit_price(Double unit_price) {
-        this.unit_price = unit_price;
-    }
-
-    public Long getStock() {
-        return stock;
-    }
-
-    public void setStock(Long stock) {
-        this.stock = stock;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getId_product() {
-        return id_product;
-    }
-
-    public void setId_product(Integer id_producto) {
-        this.id_product = id_producto;
-    }
-
-    @ManyToMany(mappedBy = "products")
-    private List<SaleBean> sales = new ArrayList<>();
-
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<SaleProductBean> saleProducts = new ArrayList<>();
 }

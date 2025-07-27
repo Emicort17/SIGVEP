@@ -3,6 +3,7 @@ package utez.edu.mx.SIGVEP.controller.sale.dto;
 
 import jakarta.persistence.Column;
 import lombok.*;
+import utez.edu.mx.SIGVEP.controller.product.dto.ProductQuantityDto;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
@@ -19,10 +20,11 @@ public class SaleDto {
 
     private Integer id_venta;
     private Date date;
-    private int total_sale;
+    private double total_sale;
     private Boolean status;
     private Integer userId;
-    private List<Integer> productIds;
+    private List<ProductQuantityDto> products;
+    private Integer quantity_products;
     private String payment_type;
 
 

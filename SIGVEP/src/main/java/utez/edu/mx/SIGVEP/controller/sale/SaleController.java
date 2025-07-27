@@ -24,7 +24,7 @@ public class SaleController {
     // Obtener todas las ventas
     @GetMapping
     public ResponseEntity<ApiResponse> getAllSales() {
-        List<SaleDto> sales = saleService.getAllSales();
+        List<SaleNewDto> sales = saleService.getAllSales();
         ApiResponse response = new ApiResponse(sales, HttpStatus.OK);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -32,7 +32,7 @@ public class SaleController {
     // Obtener una venta por ID
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getSaleById(@PathVariable Integer id) {
-        Optional<SaleDto> sale = saleService.getSaleById(id);
+        Optional<SaleNewDto> sale = saleService.getSaleById(id);
         ApiResponse response;
 
         if (sale.isPresent()) {
@@ -49,7 +49,7 @@ public class SaleController {
     public ResponseEntity<ApiResponse> createSale(@Valid @RequestBody SaleDto saleDto) {
         ApiResponse response;
         try {
-            SaleNewDto createdSale = saleService.saveSale(saleDto);
+            SaleDto createdSale = saleService.saveSale(saleDto);
             response = new ApiResponse(createdSale, HttpStatus.CREATED);
         } catch (Exception e) {
             response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, true, "Error al crear la venta");
@@ -60,7 +60,7 @@ public class SaleController {
     // Actualizar venta
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateSale(@PathVariable Integer id, @Valid @RequestBody SaleDto saleDto) {
-        Optional<SaleNewDto> updatedSale = saleService.updateSale(id, saleDto);
+        Optional<SaleDto> updatedSale = saleService.updateSale(id, saleDto);
         ApiResponse response;
 
         if (updatedSale.isPresent()) {
