@@ -55,38 +55,36 @@ function Main() {
     ],
   };
 
-  // Aquí después puedes traer tus datos filtrados y reemplazar ventasDia, ventasMensuales, ventasAnuales
-
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
-      <h1 className="text-xl font-bold mb-4">Inicio</h1>
+    <div className="min-h-screen">
+      <h1 className="text-2xl font-bold mb-4">Inicio</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4 text-center">
-          <div className="text-gray-500 text-sm">Ventas del Día</div>
+        <div className="bg-white rounded-lg shadow-md p-4 text-center">
+          <div className="text-gray-700 font-poppins font-bold text-xl">Ventas del Día</div>
           <div className="text-2xl font-bold custom-blue">$3,252.52</div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4 text-center">
-          <div className="text-gray-500 text-sm">Ventas Mensuales</div>
+        <div className="bg-white rounded-lg shadow-md p-4 text-center">
+          <div className="text-gray-700 font-poppins font-bold text-xl">Ventas Mensuales</div>
           <div className="text-2xl font-bold custom-blue">$25,252.52</div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4 text-center">
-          <div className="text-gray-500 text-sm">Ventas Anuales</div>
+        <div className="bg-white rounded-lg shadow-md p-4 text-center">
+          <div className="text-gray-700 font-poppins font-bold text-xl">Ventas Anuales</div>
           <div className="text-2xl font-bold custom-blue">$3,251,252.52</div>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
-          <div className="font-bold mb-2">Ventas del Día</div>
+          <div className="font-semibold mb-2 text-2xl">Ventas del Día</div>
           <Line data={lineData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={180} />
         </div>
         <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
-          <div className="font-bold mb-2">Ventas Mensuales</div>
+          <div className="font-semibold mb-2 text-2xl">Ventas Mensuales</div>
           <Pie data={pieData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } } }} height={180} />
         </div>
       </div>
       <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
-        <div className="font-bold mb-2">Ventas Anuales</div>
-        <Bar data={barData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={220} />
+        <div className="font-semibold mb-2 text-2xl">Ventas Anuales</div>
+        <Bar data={barData} options={{ responsive: true, plugins: { legend: { display: true } } }} height={220} />
       </div>
     </div>
   );
