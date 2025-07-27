@@ -89,17 +89,51 @@ public class UserService {
 
     private void setUsuarioData(UserBean usuario, UserDto userDto, boolean isNew) {
         logger.info("Iniciando la configuración del usuario...");
+
+        if (userDto.getNombre() == null || userDto.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacío.");
+        }
+        if (userDto.getNombre().length() > 30) {
+            throw new IllegalArgumentException("El nombre excede los 30 caracteres permitidos.");
+        }
         usuario.setName(userDto.getNombre());
+
+        if (userDto.getApellido() == null || userDto.getApellido().trim().isEmpty()) {
+            throw new IllegalArgumentException("El apellido no puede estar vacío.");
+        }
+        if (userDto.getApellido().length() > 50) {
+            throw new IllegalArgumentException("El apellido excede los 50 caracteres permitidos.");
+        }
         usuario.setSurname(userDto.getApellido());
+
+        if (userDto.getTelefono() == null || userDto.getTelefono().trim().isEmpty()) {
+            throw new IllegalArgumentException("El teléfono no puede estar vacío.");
+        }
+        if (!userDto.getTelefono().matches("\\d{10}")) {
+            throw new IllegalArgumentException("El teléfono debe contener exactamente 10 dígitos.");
+        }
+        if (usuarioDao.existsByTelephone(userDto.getTelefono())) {
+            throw new IllegalArgumentException("Ya existe un usuario con ese número de teléfono.");
+        }
         usuario.setTelephone(userDto.getTelefono());
+
+        if (userDto.getEmail() == null || userDto.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("El email no puede estar vacío.");
+        }
+        if (!userDto.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new IllegalArgumentException("El formato del email no es válido.");
+        }
+        if (usuarioDao.existsByEmail(userDto.getEmail())) {
+            throw new IllegalArgumentException("Ya existe un usuario con ese email.");
+        }
         usuario.setEmail(userDto.getEmail());
 
-        if (userDto.getContrasena() == null || userDto.getContrasena().isEmpty()) {
-            throw new IllegalArgumentException("La contraseña es obligatoria para un nuevo usuario.");
+        if (isNew) {
+            if (userDto.getContrasena() == null || userDto.getContrasena().isEmpty()) {
+                throw new IllegalArgumentException("La contraseña es obligatoria para un nuevo usuario.");
+            }
+            usuario.setPassword(passwordEncoder.encode(userDto.getContrasena()));
         }
-
-        String encodedPassword = passwordEncoder.encode(userDto.getContrasena());
-        usuario.setPassword(encodedPassword);
 
         if (userDto.getRole() != null && userDto.getRole().getName() != null) {
             roleDao.findByName(userDto.getRole().getName()).ifPresent(usuario::setRole);
@@ -110,16 +144,55 @@ public class UserService {
         logger.info("Configuración del usuario completada: {}", usuario);
     }
 
+
     private void setUsuarioDataForUpdate(UserBean usuario, UserDto userDto) {
-        if (userDto.getNombre() != null) usuario.setName(userDto.getNombre());
-        if (userDto.getApellido() != null) usuario.setSurname(userDto.getApellido());
-        if (userDto.getTelefono() != null) usuario.setTelephone(userDto.getTelefono());
-        if (userDto.getEmail() != null) usuario.setEmail(userDto.getEmail());
+        if (userDto.getNombre() != null) {
+            if (userDto.getNombre().trim().isEmpty()) {
+                throw new IllegalArgumentException("El nombre no puede estar vacío.");
+            }
+            if (userDto.getNombre().length() > 30) {
+                throw new IllegalArgumentException("El nombre excede los 30 caracteres permitidos.");
+            }
+            usuario.setName(userDto.getNombre());
+        }
+
+        if (userDto.getApellido() != null) {
+            if (userDto.getApellido().trim().isEmpty()) {
+                throw new IllegalArgumentException("El apellido no puede estar vacío.");
+            }
+            if (userDto.getApellido().length() > 50) {
+                throw new IllegalArgumentException("El apellido excede los 50 caracteres permitidos.");
+            }
+            usuario.setSurname(userDto.getApellido());
+        }
+
+        if (userDto.getTelefono() != null) {
+            if (!userDto.getTelefono().matches("\\d{10}")) {
+                throw new IllegalArgumentException("El teléfono debe contener exactamente 10 dígitos.");
+            }
+
+            Optional<UserBean> usuarioExistente = usuarioDao.findByTelephone(userDto.getTelefono());
+            if (usuarioExistente.isPresent() && !usuarioExistente.get().getId().equals(usuario.getId())) {
+                throw new IllegalArgumentException("Ya existe otro usuario con ese número de teléfono.");
+            }
+            usuario.setTelephone(userDto.getTelefono());
+        }
+
+        if (userDto.getEmail() != null) {
+            if (!userDto.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                throw new IllegalArgumentException("El formato del email no es válido.");
+            }
+
+            Optional<UserBean> usuarioExistente = usuarioDao.findByEmail(userDto.getEmail());
+            if (usuarioExistente.isPresent() && !usuarioExistente.get().getId().equals(usuario.getId())) {
+                throw new IllegalArgumentException("Ya existe otro usuario con ese email.");
+            }
+            usuario.setEmail(userDto.getEmail());
+        }
 
         if (userDto.getRole() != null && userDto.getRole().getName() != null) {
             roleDao.findByName(userDto.getRole().getName()).ifPresent(usuario::setRole);
         }
-
     }
 
 
