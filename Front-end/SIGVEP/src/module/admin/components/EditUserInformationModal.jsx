@@ -86,7 +86,8 @@ function EditUserInformationModal({ isOpen, onClose, userData, onSuccess }) {
           onClose();
         }
       } catch (error) {
-        alertaError("Error", "Error al guardar los datos");
+        const errorMessage = error.response?.data?.message || 'No se pudo actualizar la información del usuario';
+        alertaError("Error", errorMessage);
       } finally {
         setSubmitting(false);
       }

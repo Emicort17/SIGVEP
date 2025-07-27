@@ -99,7 +99,8 @@ function NewUserModal({ isOpen, onClose, onSuccess }) {
                     onClose();
                 }
             } catch (error) {
-                alertaError('Error', 'No se pudo crear el usuario');
+                const errorMessage = error.response?.data?.message || 'No se pudo crear el usuario';
+                alertaError('Error', errorMessage);
             } finally {
                 setSubmitting(false);
             }

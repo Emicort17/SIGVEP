@@ -20,6 +20,8 @@ function Products() {
   const [editProductData, setEditProductData] = useState(null);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [statusFilter, setStatusFilter] = useState('todos');
+  const [showStockDropdown, setShowStockDropdown] = useState(false);
+  const [stockFilter, setStockFilter] = useState('todos');
   const rows = 8;
 
   const fetchProducts = async () => {
@@ -121,7 +123,12 @@ function Products() {
       (statusFilter === 'habilitado' && p.status === true) ||
       (statusFilter === 'deshabilitado' && p.status === false);
 
-    return matchesSearch && matchesStatus;
+    const matchesStock =
+      stockFilter === 'todos' ||
+      (stockFilter === 'bajo' && p.stock < 30) ||
+      (stockFilter === 'normal' && p.stock >= 30);
+
+    return matchesSearch && matchesStatus && matchesStock;
   });
 
   const statusHeaderTemplate = () => (
@@ -163,12 +170,58 @@ function Products() {
     </div>
   );
 
+  const stockHeaderTemplate = () => (
+    <div className="relative flex items-center gap-2">
+      <span>Stock</span>
+      <button
+        type="button"
+        className="focus:outline-none px-2"
+        onClick={e => {
+          e.stopPropagation();
+          setShowStockDropdown((prev) => !prev);
+        }}
+        tabIndex={-1}
+      >
+        <img src={Filter} alt="Filtrar" className="w-4 h-4 cursor-pointer" />
+      </button>
+      {showStockDropdown && (
+        <div className="absolute right-0 top-8 z-50 bg-white border rounded shadow p-2 min-w-[120px]">
+          <button
+            className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${stockFilter === 'todos' ? 'font-bold text-blue-800' : ''}`}
+            onClick={() => { setStockFilter('todos'); setShowStockDropdown(false); }}
+          >
+            Todos
+          </button>
+          <button
+            className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${stockFilter === 'bajo' ? 'font-bold text-red-700' : ''}`}
+            onClick={() => { setStockFilter('bajo'); setShowStockDropdown(false); }}
+          >
+            Stock Bajo
+          </button>
+          <button
+            className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${stockFilter === 'normal' ? 'font-bold text-green-700' : ''}`}
+            onClick={() => { setStockFilter('normal'); setShowStockDropdown(false); }}
+          >
+            Stock Normal
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
   useEffect(() => {
     if (!showStatusDropdown) return;
     const handleClick = () => setShowStatusDropdown(false);
     window.addEventListener('click', handleClick);
     return () => window.removeEventListener('click', handleClick);
   }, [showStatusDropdown]);
+
+  useEffect(() => {
+    if (!showStockDropdown) return;
+    const handleClick = () => setShowStockDropdown(false);
+    window.addEventListener('click', handleClick);
+    return () => window.removeEventListener('click', handleClick);
+  }, [showStockDropdown]);
 
   return (
     <div className="flex flex-col flex-1 w-full h-full">
@@ -209,7 +262,7 @@ function Products() {
             <Column body={rowNumberTemplate} header="#" style={{ width: '40px' }} />
             <Column field="name" header="Nombre" style={{ minWidth: '200px' }} />
             <Column body={priceBodyTemplate} header="Precio" style={{ minWidth: '100px' }} />
-            <Column body={stockBodyTemplate} header="Stock" style={{ minWidth: '80px' }} />
+            <Column body={stockBodyTemplate} header={stockHeaderTemplate} style={{ minWidth: '80px' }} />
             <Column body={categoryBodyTemplate} header="Categoría" style={{ minWidth: '150px' }} />
             <Column field="status" header={statusHeaderTemplate} body={statusBodyTemplate} style={{ minWidth: '120px' }} />
             <Column header="Acción" body={actionBodyTemplate} style={{ minWidth: '100px', textAlign: 'center' }} />
