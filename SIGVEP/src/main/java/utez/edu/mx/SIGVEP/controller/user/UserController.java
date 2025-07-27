@@ -69,15 +69,19 @@ public class UserController {
     // Actualizar un usuario existente
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateUsuario(@PathVariable Integer id, @Valid @RequestBody UserDto usuarioDto) {
-        Optional<UserDto> updatedUsuario = usuarioService.updateUsuario(id, usuarioDto);
         ApiResponse response;
-
-        if (updatedUsuario.isPresent()) {
-            response = new ApiResponse(updatedUsuario.get(), HttpStatus.OK);
-        } else {
-            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado para actualizar");
+        try {
+            Optional<UserDto> updatedUsuario = usuarioService.updateUsuario(id, usuarioDto);
+            if(updatedUsuario.isPresent()){
+                response = new ApiResponse(updatedUsuario.get(), HttpStatus.OK);
+            } else {
+                response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado para actualizar");
+            }
+        } catch (IllegalArgumentException e) {
+            response = new ApiResponse(HttpStatus.BAD_REQUEST, true, e.getMessage());
+        } catch (Exception e) {
+            response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, true, "Error al actualizar el usuario");
         }
-
         return new ResponseEntity<>(response, response.getStatus());
     }
 
