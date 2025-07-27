@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from 'react-router-dom';
-import { alertaExito, alertaError, alertaCargando } from '../../config/context/alerts.js';
+import { alertaExito, alertaError, alertaCargando, alertaPregunta } from '../../config/context/alerts.js';
+import { AxiosClient } from '../../config/http-gateway/http-client';
 
 import Logo from '../../assets/iconw.svg';
 import Fondo from '../../assets/img/fondo.jpg';
@@ -19,6 +20,54 @@ const CreateUser = () => {
     const labelStyles = "block mb-2 text-base custom-blue font-medium text-gray-900";
     const inputStyles = "bg-custom-bluelight border-t-0 border-x-0 text-gray-900 text-sm rounded-lg focus:ring-0 block w-full ps-3 p-2.5 custom-border-bottom";
 
+    const validationSchema = yup.object({
+        nombre: yup
+            .string()
+            .test(
+                "no-spaces",
+                "No se permiten espacios al inicio o final",
+                value => value === undefined || (value === value?.trim())
+            )
+            .required('El nombre es obligatorio'),
+        apellidoPaterno: yup
+            .string()
+            .test(
+                "no-spaces",
+                "No se permiten espacios al inicio o final",
+                value => value === undefined || (value === value?.trim())
+            )
+            .required('El apellido paterno es obligatorio'),
+        apellidoMaterno: yup
+            .string()
+            .test(
+                "no-spaces",
+                "No se permiten espacios al inicio o final",
+                value => value === undefined || (value === value?.trim())
+            )
+            .required('El apellido materno es obligatorio'),
+        email: yup
+            .string()
+            .test(
+                "no-spaces",
+                "No se permiten espacios al inicio o final",
+                value => value === undefined || (value === value?.trim())
+            )
+            .email('Correo electrónico inválido')
+            .required('El correo electrónico es obligatorio'),
+        telefono: yup
+            .string()
+            .matches(/^[0-9]{10}$/, 'El teléfono debe tener 10 dígitos')
+            .required('El teléfono es obligatorio'),
+        password: yup
+            .string()
+            .min(6, 'La contraseña debe tener al menos 6 caracteres')
+            .required('La contraseña es obligatoria'),
+        confirmPassword: yup
+            .string()
+            .oneOf([yup.ref('password'), null], 'Las contraseñas no coinciden')
+            .required('Confirma tu contraseña')
+    });
+
     const formik = useFormik({
         initialValues: {
             nombre: '',
@@ -29,25 +78,30 @@ const CreateUser = () => {
             password: '',
             confirmPassword: ''
         },
-        validationSchema: yup.object({
-            nombre: yup.string().required('El nombre es obligatorio'),
-            apellidoPaterno: yup.string().required('El apellido paterno es obligatorio'),
-            apellidoMaterno: yup.string().required('El apellido materno es obligatorio'),
-            email: yup.string().email('Correo electrónico inválido').required('El correo electrónico es obligatorio'),
-            telefono: yup.string().matches(/^[0-9]{10}$/, 'El teléfono debe tener 10 dígitos').required('El teléfono es obligatorio'),
-            password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es obligatoria'),
-            confirmPassword: yup.string()
-                .oneOf([yup.ref('password'), null], 'Las contraseñas no coinciden')
-                .required('Confirma tu contraseña')
-        }),
+        validationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
+            const confirmed = await alertaPregunta(
+                "¿Deseas crear tu cuenta?",
+                "Esta acción creará tu usuario en el sistema."
+            );
+            if (!confirmed) {
+                setSubmitting(false);
+                return;
+            }
             alertaCargando("Creando cuenta...", "Por favor, espera un momento.");
             try {
-                const response = await AxiosClient.post('/auth/create-user', values);
+                const body = {
+                    nombre: values.nombre,
+                    apellido: `${values.apellidoPaterno} ${values.apellidoMaterno}`,
+                    telefono: values.telefono,
+                    email: values.email,
+                    contrasena: values.password
+                };
+                const response = await AxiosClient.post('/auth/create-user', body);
                 if (response.data && response.data.success) {
                     alertaExito("¡Cuenta creada!", "Ahora puedes iniciar sesión.");
                     resetForm();
-                    navigate("/");
+                    navigate("/sign-in");
                 } else {
                     alertaError("Error", "No se pudo crear la cuenta. Por favor, verifica tus datos.");
                 }
@@ -152,7 +206,7 @@ const CreateUser = () => {
                             </div>
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="email" className={labelStyles}>Correo Electrónica:</label>
+                            <label htmlFor="email" className={labelStyles}>Correo Electrónico:</label>
                             <input
                                 id="email"
                                 name="email"
@@ -247,7 +301,7 @@ const CreateUser = () => {
                             ¿Ya estás registrado?{" "}
                             <span
                                 className="custom-blue hover:underline cursor-pointer"
-                                onClick={() => navigate("/")}
+                                onClick={() => navigate("/sign-in")}
                             >
                                 Ingresa a tu cuenta
                             </span>

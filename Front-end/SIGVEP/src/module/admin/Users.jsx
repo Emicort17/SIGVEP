@@ -5,6 +5,7 @@ import Add from '../../assets/addw.svg';
 import Edit from '../../assets/edit1.svg';
 import EditW from '../../assets/editw.svg';
 import Search from '../../assets/search1.svg';
+import Filter from '../../assets/filter.svg';
 import { AxiosClient } from '../../config/http-gateway/http-client';
 import NewUserModal from './components/NewUserModal';
 import EditUserInformationModal from './components/EditUserInformationModal';
@@ -17,6 +18,8 @@ function Users() {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [editUserData, setEditUserData] = useState(null);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('todos');
   const rows = 8;
 
   const fetchUsers = async () => {
@@ -88,17 +91,64 @@ function Users() {
     );
   };
 
-  const filteredUsers = user.filter((u) =>
+  const filteredUsers = user.filter((u) => {
+  const matchesSearch =
     `${u.nombre || ''} ${u.apellido || ''}`.toLowerCase().includes(search.toLowerCase()) ||
     (u.correo || '').toLowerCase().includes(search.toLowerCase()) ||
-    (u.telefono || '').includes(search)
-  );
+    (u.telefono || '').includes(search);
+
+  const matchesStatus =
+    statusFilter === 'todos' ||
+    (statusFilter === 'habilitado' && u.status === true) ||
+    (statusFilter === 'deshabilitado' && u.status === false);
+
+  return matchesSearch && matchesStatus;
+});
 
   const fullNameBodyTemplate = (rowData) => (
     <span>
       {rowData.nombre || ''} {rowData.apellido || ''}
     </span>
   );
+
+  const statusHeaderTemplate = () => (
+  <div className="relative flex items-center gap-2">
+    <span>Estatus</span>
+    <button
+      type="button"
+      className="focus:outline-none px-2"
+      onClick={e => {
+        e.stopPropagation();
+        setShowStatusDropdown((prev) => !prev);
+      }}
+      tabIndex={-1}
+    >
+      <img src={Filter} alt="Filtrar" className="w-4 h-4 cursor-pointer" />
+    </button>
+    {showStatusDropdown && (
+      <div className="absolute right-0 top-8 z-50 bg-white border rounded shadow p-2 min-w-[120px]">
+        <button
+          className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${statusFilter === 'todos' ? 'font-bold text-blue-800' : ''}`}
+          onClick={() => { setStatusFilter('todos'); setShowStatusDropdown(false); }}
+        >
+          Todos
+        </button>
+        <button
+          className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${statusFilter === 'habilitado' ? 'font-bold text-green-700' : ''}`}
+          onClick={() => { setStatusFilter('habilitado'); setShowStatusDropdown(false); }}
+        >
+          Habilitado
+        </button>
+        <button
+          className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${statusFilter === 'deshabilitado' ? 'font-bold text-red-700' : ''}`}
+          onClick={() => { setStatusFilter('deshabilitado'); setShowStatusDropdown(false); }}
+        >
+          Deshabilitado
+        </button>
+      </div>
+    )}
+  </div>
+);
 
   return (
     <div className="flex flex-col flex-1 w-full h-full">
@@ -140,7 +190,7 @@ function Users() {
             <Column body={fullNameBodyTemplate} header="Nombre Completo" style={{ minWidth: '200px' }} />
             <Column field="email" header="Correo Electrónico" style={{ minWidth: '200px' }} />
             <Column field="telefono" header="Teléfono" style={{ minWidth: '120px' }} />
-            <Column field="status" header="Estatus" body={statusBodyTemplate} style={{ minWidth: '120px', }} />
+            <Column field="status" header={statusHeaderTemplate} body={statusBodyTemplate} style={{ minWidth: '120px', }} />
             <Column header="Acción" body={actionBodyTemplate} style={{ minWidth: '100px', textAlign: 'center' }} />
           </DataTable>
         </div>
