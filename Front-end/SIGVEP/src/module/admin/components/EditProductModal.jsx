@@ -11,7 +11,6 @@ function EditProductModal({ isOpen, onClose, productData, onSuccess }) {
     const selectStyles = "bg-custom-bluelight border-t-0 border-x-0 text-gray-900 text-sm rounded-lg focus:ring-0 block w-full ps-3 p-2.5 custom-border-bottom";
 
     const [categories, setCategories] = useState([]);
-
     const validationSchema = yup.object({
         name: yup
             .string()
