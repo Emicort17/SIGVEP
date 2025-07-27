@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 
-import search from '../../assets/search.svg'
+import search_white from '../../assets/search_white.svg';
 import Category from '../../assets/categoryd.svg'
 import shopping_cart from '../../assets/shopping_cart.svg'
 
@@ -70,7 +70,7 @@ function NewSales() {
         <div className="flex gap-4 mb-5 items-center">
           <div className="relative flex-1 relative w-full">
             <img
-              src={search}
+              src={search_white}
               alt="Buscar"
               className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-60"
             />
