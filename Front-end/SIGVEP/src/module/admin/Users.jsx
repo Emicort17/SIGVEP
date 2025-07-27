@@ -94,7 +94,7 @@ function Users() {
   const filteredUsers = user.filter((u) => {
   const matchesSearch =
     `${u.nombre || ''} ${u.apellido || ''}`.toLowerCase().includes(search.toLowerCase()) ||
-    (u.correo || '').toLowerCase().includes(search.toLowerCase()) ||
+    (u.email || '').toLowerCase().includes(search.toLowerCase()) ||
     (u.telefono || '').includes(search);
 
   const matchesStatus =
