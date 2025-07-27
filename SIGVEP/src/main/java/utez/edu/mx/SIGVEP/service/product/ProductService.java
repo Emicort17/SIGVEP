@@ -34,7 +34,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductDto> findAll(){
-        return productDao.findAll().stream()
+        return productDao.findAllByOrderByIdAsc().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -77,7 +77,7 @@ public class ProductService {
 
     private ProductDto toDTO(ProductBean productBean) {
         return ProductDto.builder()
-                .id_product(productBean.getId_product())
+                .id_product(productBean.getId())
                 .name(productBean.getName())
                 .unit_price(productBean.getUnit_price())
                 .stock(productBean.getStock())

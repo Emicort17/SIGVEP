@@ -11,7 +11,7 @@ public class BitacoraService {
     private BitacoraRepository bitacoraRepository;
 
     public List<BitacoraBean> getAllBitacoras() {
-        List<BitacoraBean> bitacoras = bitacoraRepository.findAll();
+        List<BitacoraBean> bitacoras = bitacoraRepository.findByOrderByIdDesc();
         return bitacoras;
     }
 

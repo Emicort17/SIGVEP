@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import utez.edu.mx.SIGVEP.model.category.CategoryBean;
-import utez.edu.mx.SIGVEP.model.sale.SaleBean;
 import utez.edu.mx.SIGVEP.model.saleproduct.SaleProductBean;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class ProductBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_producto", nullable = false)
-    private Integer id_product;
+    private Integer id;
 
     @Column(name = "nombre", nullable = false)
     private String name;

@@ -3,7 +3,6 @@ package utez.edu.mx.SIGVEP.service.category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.SIGVEP.controller.category.dto.CategoryDto;
@@ -32,7 +31,7 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public List<CategoryDto> findAll(){
-        return categoryDao.findAll().stream()
+        return categoryDao.findAllByOrderByIdAsc().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }

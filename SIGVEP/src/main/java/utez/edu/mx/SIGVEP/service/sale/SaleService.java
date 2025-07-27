@@ -159,7 +159,7 @@ public class SaleService {
                 .userId(sale.getUser().getId())
                 .products(sale.getSaleProducts().stream()
                         .map(sp -> ProductQuantityDto.builder()
-                                .productId(sp.getProduct().getId_product())
+                                .productId(sp.getProduct().getId())
                                 .quantity(sp.getQuantity())
                                 .build())
                         .collect(Collectors.toList()))

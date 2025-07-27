@@ -21,7 +21,7 @@ public class CategoryBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_categoria", nullable = false)
-    private Integer id_category;
+    private Integer id;
 
     @Column(name = "nombre", nullable = false)
     private String name;
@@ -69,10 +69,10 @@ public class CategoryBean {
     }
 
     public Integer getId_category() {
-        return id_category;
+        return id;
     }
 
-    public void setId_category(Integer id_categoria) {
-        this.id_category = id_categoria;
+    public void setId_category(Integer id) {
+        this.id = id;
     }
 }

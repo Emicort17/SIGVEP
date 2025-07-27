@@ -18,7 +18,7 @@ public class ProductDto {
     private CategoryBean category;
 
     public ProductDto(ProductBean productEntity) {
-        this.id_product = productEntity.getId_product();
+        this.id_product = productEntity.getId();
         this.name = productEntity.getName();
         this.unit_price = productEntity.getUnit_price();
         this.stock = productEntity.getStock();
@@ -28,7 +28,7 @@ public class ProductDto {
 
     public ProductBean toEntity(){
         ProductBean productBean = new ProductBean();
-        productBean.setId_product(this.id_product);
+        productBean.setId(this.id_product);
         productBean.setName(this.name);
         productBean.setUnit_price(this.unit_price);
         productBean.setStock(this.stock);
