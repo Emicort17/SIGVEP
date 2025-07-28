@@ -231,3 +231,30 @@ input[type="text"].search-input {
 .btn-edit-action:hover .icon-hover {
   display: block;
 }
+
+.custom-paginator-cards .p-paginator {
+  background: transparent;
+  border: none;
+  margin-top: 12px;
+}
+.custom-paginator-cards .p-paginator .p-paginator-page {
+  border-radius: 12px;
+  margin: 0 4px;
+  color: #1E3A8A;
+  font-weight: 400;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.08);
+  transition: background 0.2s;
+}
+.custom-paginator-cards .p-paginator .p-paginator-page.p-highlight {
+  background: #1E3A8A;
+  color: #fff;
+}
+.custom-paginator-cards .p-paginator .p-paginator-page:hover {
+  background: #1E3A8A22;
+  color: #1E3A8A;
+}
+.custom-paginator-cards .p-paginator .p-paginator-element {
+  border-radius: 12px;
+  padding: 0 8px;
+}
