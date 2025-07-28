@@ -25,6 +25,7 @@ public class SaleNewDto {
     private List<ProductQuantityNewDto> products;
     private Integer quantity_products;
     private String payment_type;
+    private String paymentIntentId;
 
     public SaleBean toEntity() {
         SaleBean saleEntity = new SaleBean();

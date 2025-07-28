@@ -39,6 +39,9 @@ public class SaleBean {
     @Column(name = "cantidad_productos", nullable = false)
     private Integer quantity_products;
 
+    @Column(name = "payment_intent_id")
+    private String paymentIntentId;
+
    @ManyToOne(fetch = FetchType.LAZY)
    @JoinColumn(name = "id_usuario", nullable = false)
    @JsonBackReference

@@ -1,5 +1,8 @@
 package utez.edu.mx.SIGVEP.service.sale;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +20,11 @@ import utez.edu.mx.SIGVEP.model.sale.SaleRepository;
 import utez.edu.mx.SIGVEP.model.saleproduct.SaleProductBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
 import utez.edu.mx.SIGVEP.model.user.UserRepository;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,17 +55,6 @@ public class SaleService {
         return saleDao.findById(id).map(this::toNewDTO);
     }
 
-    @Transactional
-    public SaleDto saveSale(SaleDto saleDto) {
-        logger.info("Guardando nueva venta con fecha: {}", saleDto.getDate());
-
-        SaleBean sale = new SaleBean();
-        setSaleData(sale, saleDto, true);
-        SaleBean savedSale = saleDao.save(sale);
-
-        logger.info("Venta guardada con ID: {}", savedSale.getId_venta());
-        return toDTO(savedSale);
-    }
 
     @Transactional
     public Optional<SaleDto> updateSale(Integer id, SaleDto saleDto) {
@@ -150,6 +145,71 @@ public class SaleService {
         }
     }
 
+    @Transactional
+    public Map<String, Object> saveSaleWithPayment(SaleDto saleDto) throws StripeException {
+        double total = calculateTotalSale(saleDto);
+
+        if ("TARJETA".equalsIgnoreCase(saleDto.getPayment_type())) {
+            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+                    .setAmount((long) (total * 100))
+                    .setCurrency("mxn")
+                    .setDescription("Venta de productos SIGVEP")
+                    .setPaymentMethod(saleDto.getPaymentMethodId())
+                    .setConfirm(true)
+                    .build();
+
+            PaymentIntent intent = PaymentIntent.create(params);
+
+            if ("succeeded".equals(intent.getStatus())) {
+                SaleBean sale = buildSaleEntity(saleDto, true);
+                sale.setPaymentIntentId(intent.getId());
+                SaleBean saved = saleDao.save(sale);
+
+                Map<String, Object> saleInfo = Map.of(
+                        "id_venta", saved.getId_venta(),
+                        "date",    saved.getDate(),
+                        "total_sale", saved.getTotal_sale(),
+                        "payment_type", saved.getPayment_type(),
+                        "paymentIntentId", intent.getId()
+                );
+
+                return Map.of(
+                        "message", "Pago con tarjeta exitoso y venta guardada",
+                        "sale", saleInfo
+                );
+            } else {
+                throw new RuntimeException("Error al procesar el pago: status " + intent.getStatus());
+            }
+        } else {
+            SaleBean sale = buildSaleEntity(saleDto, true);
+            SaleBean saved = saleDao.save(sale);
+
+            Map<String, Object> saleInfo = Map.of(
+                    "id_venta", saved.getId_venta(),
+                    "date",    saved.getDate(),
+                    "total_sale", saved.getTotal_sale(),
+                    "payment_type", saved.getPayment_type()
+            );
+
+            return Map.of(
+                    "message", "Venta registrada con pago en efectivo",
+                    "sale", saleInfo
+            );
+        }
+    }
+
+
+
+    public double calculateTotalSale(SaleDto saleDto) {
+        return saleDto.getProducts().stream()
+                .mapToDouble(productQuantity -> productQuantity.getQuantity() *
+                        productRepository.findById(productQuantity.getProductId())
+                                .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productQuantity.getProductId()))
+                                .getUnit_price())
+                .sum();
+    }
+
+
     private SaleDto toDTO(SaleBean sale) {
         return SaleDto.builder()
                 .id_venta(sale.getId_venta())
@@ -164,6 +224,7 @@ public class SaleService {
                                 .build())
                         .collect(Collectors.toList()))
                 .payment_type(sale.getPayment_type())
+                .paymentIntentId(sale.getPaymentIntentId())
                 .quantity_products(sale.getQuantity_products())
                 .build();
     }
@@ -182,6 +243,7 @@ public class SaleService {
                                 .build())
                         .collect(Collectors.toList()))
                 .payment_type(sale.getPayment_type())
+                .paymentIntentId(sale.getPaymentIntentId())
                 .quantity_products(sale.getQuantity_products())
                 .build();
     }
@@ -193,4 +255,11 @@ public class SaleService {
                 .apellido(userDto.getSurname())
                 .build();
     }
+
+    private SaleBean buildSaleEntity(SaleDto saleDto, boolean isNew) {
+        SaleBean sale = new SaleBean();
+        setSaleData(sale, saleDto, isNew);
+        return sale;
+    }
+
 }

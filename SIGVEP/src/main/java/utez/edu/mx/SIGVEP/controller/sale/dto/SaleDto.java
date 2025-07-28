@@ -26,6 +26,9 @@ public class SaleDto {
     private List<ProductQuantityDto> products;
     private Integer quantity_products;
     private String payment_type;
+    private String paymentMethodId;
+
+    private String paymentIntentId;
 
 
     public SaleBean toEntity() {

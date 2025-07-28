@@ -1,4 +1,7 @@
 package utez.edu.mx.SIGVEP.controller.sale;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +14,7 @@ import utez.edu.mx.SIGVEP.controller.sale.dto.SaleNewDto;
 import utez.edu.mx.SIGVEP.service.sale.SaleService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -49,13 +53,16 @@ public class SaleController {
     public ResponseEntity<ApiResponse> createSale(@Valid @RequestBody SaleDto saleDto) {
         ApiResponse response;
         try {
-            SaleDto createdSale = saleService.saveSale(saleDto);
-            response = new ApiResponse(createdSale, HttpStatus.CREATED);
-        } catch (Exception e) {
-            response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, true, "Error al crear la venta");
+            Map<String, Object> result = saleService.saveSaleWithPayment(saleDto);
+            response = new ApiResponse(result, HttpStatus.CREATED);
+        } catch (StripeException e) {
+            response = new ApiResponse(HttpStatus.BAD_REQUEST, true, "Error de Stripe: " + e.getMessage());
+        } catch (RuntimeException e) {
+            response = new ApiResponse(HttpStatus.BAD_REQUEST, true, "Error interno: " + e.getMessage());
         }
         return new ResponseEntity<>(response, response.getStatus());
     }
+
 
     // Actualizar venta
     @PutMapping("/{id}")
@@ -86,4 +93,7 @@ public class SaleController {
 
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+
+
 }
