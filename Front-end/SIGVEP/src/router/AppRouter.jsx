@@ -18,7 +18,6 @@ import Sales from '../module/admin/Sales';
 import NewSales from '../module/admin/NewSales';
 import UserLayout from '../module/user/UserLayout';
 import ProductsU from '../module/user/ProductsU';
-import ProfileU from '../module/user/ProfileU';
 import NewSalesU from '../module/user/NewSalesU';
 import Logo from '../assets/icon.svg';
 
@@ -158,7 +157,6 @@ const AppRouter = () => {
           }
         >
           <Route index element={<ProductsU />} />
-          <Route path="profile" element={<ProfileU />} />
           <Route path="new-sale" element={<NewSalesU />} />
         </Route>
 

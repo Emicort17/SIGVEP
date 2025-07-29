@@ -4,10 +4,12 @@ import Ojo from '../../../assets/eye.svg';
 import Ojo1 from '../../../assets/eye1.svg';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 import { alertaCargando, alertaError, alertaExito } from '../../../config/context/alerts';
 import { AxiosClient } from '../../../config/http-gateway/http-client';
 
 function ChangePasswordModal({ isOpen, onClose, datosPersonales, onSuccess }) {
+  const navigate = useNavigate();
   const labelStyles = "block mb-2 text-base custom-blue font-medium text-gray-900";
   const inputStyles = "bg-custom-bluelight border-t-0 border-x-0 text-gray-900 text-sm rounded-lg focus:ring-0 block w-full ps-3 p-2.5 custom-border-bottom";
 
@@ -41,12 +43,16 @@ function ChangePasswordModal({ isOpen, onClose, datosPersonales, onSuccess }) {
           contrasenaActual: values.oldPassword,
           nuevaContrasena: values.newPassword,
         });
-        if (response?.status === "OK") {
-          alertaExito('Éxito', '¡Contraseña cambiada correctamente!');
+        if (onSuccess && response?.status === "OK") {
+          alertaExito('Éxito', 'Por favor, vuelve a iniciar sesión con tu nueva contraseña.');
           resetForm();
-          if (onSuccess) onSuccess();
-          onClose();
+          onSuccess();
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/sign-in');
+          return;
         }
+        onClose();
       } catch (error) {
         console.log('ChangePassword error: ', error);
         if (error?.response?.data?.message === 'La contraseña actual es incorrecta.') {

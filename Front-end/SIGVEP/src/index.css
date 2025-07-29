@@ -258,3 +258,7 @@ input[type="text"].search-input {
   border-radius: 12px;
   padding: 0 8px;
 }
+
+.custom-row-spacing {
+  height: 56px;
+}
