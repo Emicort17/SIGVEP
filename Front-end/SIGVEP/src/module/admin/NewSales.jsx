@@ -1,33 +1,54 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { AxiosClient } from '../../config/http-gateway/http-client';
+import { Elements, CardElement, useStripe, useElements, } from "@stripe/react-stripe-js";
 
+
+import { alertaExito, alertaError } from '../../config/context/alerts';
 import search_white from '../../assets/search_white.svg';
 import Category from '../../assets/categoryd.svg'
 import shopping_cart from '../../assets/shopping_cart.svg'
 
-const productsData = [
-  { id: 1, nombre: "Guantes de boxeo", precio: 152, stock: 52 },
-  { id: 2, nombre: "Agua embotellada", precio: 15, stock: 78 },
-  { id: 3, nombre: "Papel higiénico", precio: 21, stock: 84 },
-  { id: 4, nombre: "Chocolates Hershy", precio: 18, stock: 25 },
-  { id: 5, nombre: "Paraguas", precio: 200, stock: 12 },
-  { id: 6, nombre: "Salchichas", precio: 54, stock: 55 },
-  { id: 7, nombre: "Agua gasificada", precio: 32, stock: 48 },
-  { id: 8, nombre: "Huevos", precio: 40, stock: 48 },
-  { id: 9, nombre: "Pan bimbo", precio: 38, stock: 85 },
-  { id: 10, nombre: "Desodorante", precio: 60, stock: 72 },
-  { id: 11, nombre: "Cloro", precio: 78, stock: 32 },
-  { id: 12, nombre: "Jabón ZOTE", precio: 12, stock: 11 },
-]
+const getFormattedLocalDateTime = () => {
+  const d = new Date();
+  const YYYY = d.getFullYear();
+  const MM = String(d.getMonth() + 1).padStart(2, '0');
+  const DD = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const ss = String(d.getSeconds()).padStart(2, '0');
+  return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
+};
 
 function NewSales() {
   const [carrito, setCarrito] = useState([])
+  const [products, setProducts] = useState([]);
+  const [metodoPago, setMetodoPago] = useState("Efectivo")
+  const [valorRecibido, setValorRecibido] = useState("")
   const [pagina, setPagina] = useState(1)
   const [Buscar, setBusqueda] = useState("")
+  const token = localStorage.getItem("token");
   const productos = 11
+  const stripe = useStripe();
+  const elements = useElements();
 
-  const filtroProductos = productsData.filter((product) =>
-    product.nombre.toLowerCase().includes(Buscar.toLowerCase()),
+
+  const fetchProducts = async () => {
+    try {
+      const response = await AxiosClient.get('/productos/');
+      setProducts(response.data || []);
+      console.log(response.data)
+    } catch (error) {
+      setProducts([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const filtroProductos = products.filter((product) =>
+    product.name.toLowerCase().includes(Buscar.toLowerCase()),
   )
 
   const paginasTotales = Math.ceil(filtroProductos.length / productos)
@@ -35,20 +56,24 @@ function NewSales() {
   const lista_productos = filtroProductos.slice(inicio, inicio + productos)
 
   const añadircarrito = (product) => {
-    const existingItem = carrito.find((item) => item.id === product.id)
+    const existingItem = carrito.find((item) => item.id_product === product.id_product)
     if (existingItem) {
-      setCarrito(carrito.map((item) => (item.id === product.id ? { ...item, cantidad: item.cantidad + 1 } : item)))
+      setCarrito(carrito.map((item) =>
+        item.id_product === product.id_product
+          ? { ...item, cantidad: item.cantidad + 1 }
+          : item
+      ))
     } else {
       setCarrito([...carrito, { ...product, cantidad: 1 }])
     }
   }
 
   const eliminarcarrito = (productId) => {
-    setCarrito(carrito.filter((item) => item.id !== productId))
+    setCarrito(carrito.filter((item) => item.id_product !== productId))
   }
 
   const preciototal = () => {
-    return carrito.reduce((total, item) => total + item.precio * item.cantidad, 0)
+    return carrito.reduce((total, item) => total + item.unit_price * item.cantidad, 0)
   }
 
   const totaldeproductos = () => {
@@ -61,7 +86,119 @@ function NewSales() {
     return "text-green-500"
   }
 
+  const calcularCambio = () => {
+    const recibido = Number.parseFloat(valorRecibido) || 0
+    const total = preciototal()
+    return recibido >= total ? recibido - total : 0
+  }
+
+  const registrarEfectivo = async () => {
+    if (metodoPago === "Efectivo") {
+      const recibido = Number.parseFloat(valorRecibido) || 0
+      const total = preciototal()
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+      const Data = {
+        date: getFormattedLocalDateTime(),
+        userId: user.user.idUsuario,
+        payment_type: "Efectivo",
+        products: carrito.map(item => ({
+          productId: item.id_product,
+          quantity: item.cantidad
+        })),
+      }
+
+      if (recibido < total) {
+        alertaError("Error", "No tienes la cantidad necesaria para procesar el pago.");
+        return
+      }
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+
+      try {
+        const response = await AxiosClient.post("http://localhost:8000/api/ventas/create", Data, config)
+
+        alertaExito("Éxito", "Venta registrada correctamente.");
+        setCarrito([])
+        setValorRecibido("")
+      } catch (error) {
+        alertaError("Error", "Hubo algun problema registrando le venta intentelo mas tarde.");
+        console.log(user.user.idUsuario)
+      }
+    }
+  }
+
+const registroPago = async () => {
+    if (metodoPago === "Efectivo") {
+      registrarEfectivo()
+    } else {
+      if (!stripe || !elements) {
+        alertaError("Error", "Stripe aún no está listo.");
+        return;
+      }
+      const cardElement = elements.getElement(CardElement);
+      const user = JSON.parse(localStorage.getItem('user') || '{}')
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+          name: "Cliente Distinguido"
+        }
+      });
+      if (error) {
+        alertaError("Error", error.message);
+        return;
+      }
+      const Data = {
+        date: getFormattedLocalDateTime(),
+        userId: user.user.idUsuario,
+        payment_type: metodoPago === "Tarjeta" ? "Tarjeta" : "Tarjeta",
+        products: carrito.map(item => ({
+          productId: item.id_product,
+          quantity: item.cantidad
+        })),
+        paymentMethodId: paymentMethod.id
+      };
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      };
+      try {
+        const response = await AxiosClient.post("http://localhost:8000/api/ventas/create", Data, config);
+        if (response.data.clientSecret) {
+          const { clientSecret, paymentIntentId } = response.data;
+          const confirmResult = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: paymentMethod.id
+          });
+          if (confirmResult.paymentIntent.status === "succeeded") {
+            const finalData = {
+              ...Data,
+              paymentIntentId
+            };
+            await AxiosClient.post("http://localhost:8000/api/ventas/create", finalData, config);
+            alertaExito("Pago exitoso", "La venta fue registrada exitosamente.");
+            setCarrito([]);
+          } else {
+            alertaError("Error", "El pago no se completó correctamente.");
+          }
+
+
+        } else {
+          alertaError("Error", "No se recibió clientSecret de Stripe.");
+        }
+      } catch (error) {
+        alertaError("Error", "Algo salió mal, por favor intenta otra vez.");
+      }
+    }
+  };
+
   return (
+
     <div className='flex gap-5 p-5 bg-gray-100 min-h-screen'>
 
       <div className="flex-1 w-2/3 rounded-lg p-5 ">
@@ -106,12 +243,12 @@ function NewSales() {
             <tbody>
               {lista_productos.map((producto, index) => (
                 <tr
-                  key={producto.id}
+                  key={producto.id_product}
                   className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} border-b border-gray-200`}
                 >
-                  <td className="p-3 text-sm">{producto.id}</td>
-                  <td className="p-3 text-sm">{producto.nombre}</td>
-                  <td className="p-3 text-sm font-medium">${producto.precio}</td>
+                  <td className="p-3 text-sm">{producto.id_product}</td>
+                  <td className="p-3 text-sm">{producto.name}</td>
+                  <td className="p-3 text-sm font-medium">${producto.unit_price}</td>
                   <td className="p-3 text-sm">
                     <span className={`font-medium ${getStock(producto.stock)}`}>● {producto.stock}</span>
                   </td>
@@ -129,7 +266,7 @@ function NewSales() {
             </tbody>
           </table>
         </div>
-        
+
         <div className="flex  justify-center items-center gap-2 mt-5">
           <button
             onClick={() => setPagina(1)}
@@ -152,9 +289,8 @@ function NewSales() {
               <button
                 key={Numero_pag}
                 onClick={() => setPagina(Numero_pag)}
-                className={`px-3 py-2 border border-gray-300 cursor-pointer rounded min-w-9 ${
-                  pagina === Numero_pag ? "bg-blue-600 text-white" : "bg-white text-black hover:bg-gray-50"
-                }`}
+                className={`px-3 py-2 border border-gray-300 cursor-pointer rounded min-w-9 ${pagina === Numero_pag ? "bg-blue-600 text-white" : "bg-white text-black hover:bg-gray-50"
+                  }`}
               >
                 {Numero_pag}
               </button>
@@ -180,14 +316,14 @@ function NewSales() {
 
       <div className="w-1/3 bg-white h-screen rounded-lg p-5 h-fit">
         <h2 className="text-2xl font-bold mb-5 text-gray-800">Carrito</h2>
-        
+
         {carrito.length === 0 ? (
           <div className="text-center py-10 px-5 text-gray-600">
             <p className="text-base leading-6">¡Oh no parece que tu carrito esta vacío por que no intentas llenarlo!</p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-[60px_1fr_80px_40px] gap-2.5 bg-blue-600 text-white p-3 rounded-md mb-2.5 text-sm font-medium">
+            <div className="grid grid-cols-[60px_1fr_80px_40px] gap-2.5 bg-[#1E3A8A] text-white p-3 rounded-md mb-2.5 text-sm font-medium">
               <div>Cant.</div>
               <div>Nombre</div>
               <div>Precio</div>
@@ -197,20 +333,91 @@ function NewSales() {
             <div className="mb-5">
               {carrito.map((producto) => (
                 <div
-                  key={producto.id}
+                  key={producto.id_product}
                   className="grid grid-cols-[60px_1fr_80px_40px] gap-2.5 p-3 border-b border-gray-200 items-center text-sm"
                 >
                   <div className="text-center font-medium">{producto.cantidad}</div>
-                  <div>{producto.nombre}</div>
-                  <div className="font-medium">${(producto.precio * producto.cantidad).toFixed(2)}</div>
+                  <div>{producto.name}</div>
+                  <div className="font-medium">${(producto.unit_price * producto.cantidad).toFixed(2)}</div>
                   <button
-                    onClick={() => eliminarcarrito(producto.id)}
+                    onClick={() => eliminarcarrito(producto.id_product)}
                     className="bg-red-500 text-white border-none rounded w-6 h-6 cursor-pointer flex items-center justify-center text-xs hover:bg-red-600"
                   >
                     🗑
                   </button>
                 </div>
               ))}
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-base font-medium mb-4 text-gray-800">Seleccione el método de Pago</h3>
+
+              <div className="space-y-3">
+                {/* Efectivo */}
+                <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-md">
+                  <input
+                    type="radio"
+                    value="Efectivo"
+                    checked={metodoPago === "Efectivo"}
+                    className="w-4 h-4 text-blue-600"
+                    onChange={(e) => setMetodoPago(e.target.value)}
+                  />
+                  <label className="flex items-center gap-2 text-sm font-medium">
+                    <span className="text-lg">💵</span>
+                    Efectivo
+                  </label>
+                </div>
+
+                <div className="ml-7">
+                  <label className="block text-sm text-gray-600 mb-1">Valor recibido:</label>
+                  <input
+                    type="number"
+                    value={valorRecibido}
+                    onChange={(e) => setValorRecibido(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                {/* Cambio */}
+                <div className="ml-7">
+                  <div className="bg-blue-100 text-blue-800 px-3 py-2 rounded-md text-sm font-medium">
+                    Cambio: ${calcularCambio().toFixed(2)}
+                  </div>
+                </div>
+
+                {/* Débito */}
+                <div className="flex items-center gap-3 p-3 rounded-md">
+                  <input
+                    type="radio"
+                    value="debito"
+                    name="metodoPago"
+                    checked={metodoPago === "debito"}
+                    onChange={(e) => setMetodoPago(e.target.value)}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <label className="flex items-center gap-2 text-sm font-medium">
+                    <span className="text-lg">💳</span>
+                    Débito
+                  </label>
+                </div>
+
+                {/* Crédito */}
+                <div className="flex items-center gap-3 p-3 rounded-md">
+                  <input
+                    type="radio"
+                    className="w-4 h-4 text-blue-600"
+                    name="metodoPago"
+                    value="credito"
+                    checked={metodoPago === "credito"}
+                    onChange={(e) => setMetodoPago(e.target.value)}
+                  />
+                  <label className="flex items-center gap-2 text-sm font-medium">
+                    <span className="text-lg">💳</span>
+                    Crédito
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div className="border-t-2 border-gray-200 pt-4 mb-5">
@@ -220,6 +427,15 @@ function NewSales() {
               </div>
             </div>
 
+            {(metodoPago === "credito" || metodoPago === "debito") && (
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tarjeta:</label>
+                <div className="border border-gray-300 rounded-md p-3">
+                  <CardElement />
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2.5">
               <button
                 onClick={() => setCarrito([])}
@@ -227,7 +443,9 @@ function NewSales() {
               >
                 Cancelar
               </button>
-              <button className="flex-[2] p-3 border-none bg-blue-600 text-white rounded-md cursor-pointer text-sm font-medium flex items-center justify-center gap-2 hover:bg-blue-700">
+              <button
+                onClick={() => registroPago()}
+                className="flex-[2] p-3 border-none bg-blue-600 text-white rounded-md cursor-pointer text-sm font-medium flex items-center justify-center gap-2 hover:bg-blue-700">
                 Ir al Pago
                 <span>›</span>
               </button>
@@ -239,6 +457,7 @@ function NewSales() {
 
     </div>
   )
+
 }
 
 export default NewSales

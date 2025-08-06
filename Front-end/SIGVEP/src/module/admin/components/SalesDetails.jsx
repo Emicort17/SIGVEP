@@ -137,7 +137,7 @@ function SalesDetails({ isOpen, onClose, saleId }) {
                         </div>
                         <div className="flex">
                             <span className="font-medium text-gray-700 w-20">Fecha:</span>
-                            <span className="text-gray-900 ml-4">{formatDate(saleDetails.date)}</span>
+                            <span className="text-gray-900 ml-4">{saleDetails.date}</span>
                         </div>
                         <div className="flex">
                             <span className="font-medium text-gray-700 w-24">Total:</span>

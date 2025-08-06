@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import search_white from '../../assets/search_white.svg';
 import { AxiosClient } from '../../config/http-gateway/http-client';
+import { useNavigate } from 'react-router-dom';
 import SalesDetails from '../admin/components/SalesDetails'
 
 function Sales() {
+  const navigate = useNavigate();
   const [buscar, setBuscar] = useState('');
   const [pagina, setPagina] = useState(1);
   const [registroVentas, setRegistroVentas] = useState([]);
@@ -51,10 +53,12 @@ function Sales() {
   }
 
   return (
-    <div className="w-full px-4 mt-5 mb-10">
+    <div className="w-full">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl font-bold mb-4">Ventas</h1>
-        <button className="bg-[#1E3A8A] hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 self-start sm:self-auto">
+        <button 
+          onClick={() => navigate('/admin/new-sale')}
+          className="bg-[#1E3A8A] hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 self-start sm:self-auto">
           + Añadir Venta
         </button>
       </div>

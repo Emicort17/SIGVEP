@@ -15,7 +15,8 @@ import Binnacle from '../module/admin/Binnacle';
 import Categories from '../module/admin/Categories';
 import Users from '../module/admin/Users';
 import Sales from '../module/admin/Sales';
-import NewSales from '../module/admin/NewSales';
+import NewSalesWrapper from '../module/admin/NewSalesWraper';
+import NewSalesWrapperU from '../module/user/NewSalesWrapperU';
 import UserLayout from '../module/user/UserLayout';
 import ProductsU from '../module/user/ProductsU';
 import NewSalesU from '../module/user/NewSalesU';
@@ -145,7 +146,7 @@ const AppRouter = () => {
           <Route path="products" element={<Products />} />
           <Route path="sales" element={<Sales />} />
           <Route path="log" element={<Binnacle />} />
-          <Route path="new-sale" element={<NewSales />} />
+          <Route path="new-sale" element={<NewSalesWrapper />} />
         </Route>
 
         <Route
@@ -157,7 +158,7 @@ const AppRouter = () => {
           }
         >
           <Route index element={<ProductsU />} />
-          <Route path="new-sale" element={<NewSalesU />} />
+          <Route path="new-sale" element={<NewSalesWrapperU />} />
         </Route>
 
         <Route

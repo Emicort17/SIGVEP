@@ -42,7 +42,7 @@ const SignIn = () => {
             payload: authData,
           });
           localStorage.setItem('token', token);
-          localStorage.setItem('user', JSON.stringify(authData)); 
+          localStorage.setItem('user', JSON.stringify(authData));
           alertaExito('Inicio de sesión exitoso', 'Bienvenido al sistema SIGVEP');
           const redirectTo = user.rol === 'ADMIN_ROLE' ? '/admin' : '/user';
           navigate(redirectTo, { replace: true });
