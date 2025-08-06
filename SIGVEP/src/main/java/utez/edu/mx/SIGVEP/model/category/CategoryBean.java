@@ -16,7 +16,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(builderClassName = "Builder", toBuilder = true)
-@ToString
 public class CategoryBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

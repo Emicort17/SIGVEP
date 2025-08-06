@@ -1,6 +1,7 @@
 package utez.edu.mx.SIGVEP.controller.sale.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import lombok.*;
 import utez.edu.mx.SIGVEP.controller.product.dto.ProductQuantityDto;
@@ -9,6 +10,8 @@ import utez.edu.mx.SIGVEP.model.sale.SaleBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -19,7 +22,8 @@ import java.util.List;
 public class SaleDto {
 
     private Integer id_venta;
-    private Date date;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime date;
     private double total_sale;
     private Boolean status;
     private Integer userId;
@@ -27,7 +31,6 @@ public class SaleDto {
     private Integer quantity_products;
     private String payment_type;
     private String paymentMethodId;
-
     private String paymentIntentId;
 
 

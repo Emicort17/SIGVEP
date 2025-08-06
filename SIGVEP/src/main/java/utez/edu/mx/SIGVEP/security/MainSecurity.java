@@ -77,7 +77,7 @@ public class MainSecurity {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(request -> {
                     var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfig.setAllowedOrigins(List.of("http://localhost"));
+                    corsConfig.setAllowedOrigins(List.of("http://localhost:5173"));
                     corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                     corsConfig.setAllowedHeaders(List.of("*"));
                     corsConfig.setAllowCredentials(true);
@@ -87,7 +87,7 @@ public class MainSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(WHITE_LIST).permitAll()
-                        .requestMatchers("/api/ventas/create", "/api/productos/", "/api/categorias/").hasAnyAuthority("ADMIN_ROLE","USER_ROLE")
+                        .requestMatchers("/api/ventas/create", "/api/productos/", "/api/categorias/", "/api/usuarios/**").hasAnyAuthority("ADMIN_ROLE","USER_ROLE")
                         .requestMatchers("/api/usuarios/**", "/api/productos/**","api/categorias/**", "api/ventas/**").hasAuthority("ADMIN_ROLE")
                         .requestMatchers("/api/usuarios/cambiar-contrasena").authenticated()
                         .anyRequest().authenticated()

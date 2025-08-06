@@ -1,6 +1,7 @@
 package utez.edu.mx.SIGVEP.model.sale;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import utez.edu.mx.SIGVEP.model.saleproduct.SaleProductBean;
 import utez.edu.mx.SIGVEP.model.user.UserBean;
 
@@ -8,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +28,9 @@ public class SaleBean {
     private Integer id_venta;
 
     @Column(name = "fecha", nullable = false)
-    private Date date;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime date;
+
 
     @Column(name = "total_venta", nullable = false)
     private double total_sale;
@@ -42,12 +47,12 @@ public class SaleBean {
     @Column(name = "payment_intent_id")
     private String paymentIntentId;
 
-   @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "id_usuario", nullable = false)
-   @JsonBackReference
-   private UserBean user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario", nullable = false)
+    @JsonBackReference
+    private UserBean user;
 
-   @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
-   private List<SaleProductBean> saleProducts = new ArrayList<>();
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SaleProductBean> saleProducts = new ArrayList<>();
 
 }

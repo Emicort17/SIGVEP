@@ -91,10 +91,10 @@ public class SaleService {
         sale.setDate(saleDto.getDate());
         sale.setTotal_sale(
                 saleDto.getProducts().stream()
-                .mapToDouble(productQuantity -> productQuantity.getQuantity() * productRepository.findById(productQuantity.getProductId())
-                        .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productQuantity.getProductId()))
-                        .getUnit_price())
-                .sum());
+                        .mapToDouble(productQuantity -> productQuantity.getQuantity() * productRepository.findById(productQuantity.getProductId())
+                                .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productQuantity.getProductId()))
+                                .getUnit_price())
+                        .sum());
         sale.setPayment_type(saleDto.getPayment_type());
 
         if (saleDto.getStatus() != null) {
@@ -149,44 +149,13 @@ public class SaleService {
     public Map<String, Object> saveSaleWithPayment(SaleDto saleDto) throws StripeException {
         double total = calculateTotalSale(saleDto);
 
-        if ("TARJETA".equalsIgnoreCase(saleDto.getPayment_type())) {
-            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                    .setAmount((long) (total * 100))
-                    .setCurrency("mxn")
-                    .setDescription("Venta de productos SIGVEP")
-                    .setPaymentMethod(saleDto.getPaymentMethodId())
-                    .setConfirm(true)
-                    .build();
-
-            PaymentIntent intent = PaymentIntent.create(params);
-
-            if ("succeeded".equals(intent.getStatus())) {
-                SaleBean sale = buildSaleEntity(saleDto, true);
-                sale.setPaymentIntentId(intent.getId());
-                SaleBean saved = saleDao.save(sale);
-
-                Map<String, Object> saleInfo = Map.of(
-                        "id_venta", saved.getId_venta(),
-                        "date",    saved.getDate(),
-                        "total_sale", saved.getTotal_sale(),
-                        "payment_type", saved.getPayment_type(),
-                        "paymentIntentId", intent.getId()
-                );
-
-                return Map.of(
-                        "message", "Pago con tarjeta exitoso y venta guardada",
-                        "sale", saleInfo
-                );
-            } else {
-                throw new RuntimeException("Error al procesar el pago: status " + intent.getStatus());
-            }
-        } else {
+        if ("Efectivo".equalsIgnoreCase(saleDto.getPayment_type())) {
             SaleBean sale = buildSaleEntity(saleDto, true);
             SaleBean saved = saleDao.save(sale);
 
             Map<String, Object> saleInfo = Map.of(
                     "id_venta", saved.getId_venta(),
-                    "date",    saved.getDate(),
+                    "date", saved.getDate(),
                     "total_sale", saved.getTotal_sale(),
                     "payment_type", saved.getPayment_type()
             );
@@ -196,6 +165,48 @@ public class SaleService {
                     "sale", saleInfo
             );
         }
+
+        if (saleDto.getPaymentIntentId() == null) {
+            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+                    .setAmount((long) (total * 100))
+                    .setCurrency("mxn")
+                    .setDescription("Venta de productos SIGVEP")
+                    .setPaymentMethod(saleDto.getPaymentMethodId())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.AUTOMATIC)
+                    .setConfirm(false)
+                    .build();
+
+            PaymentIntent intent = PaymentIntent.create(params);
+
+            return Map.of(
+                    "message", "PaymentIntent creado. Confirmar en frontend.",
+                    "clientSecret", intent.getClientSecret(),
+                    "paymentIntentId", intent.getId()
+            );
+        }
+
+        PaymentIntent paymentIntent = PaymentIntent.retrieve(saleDto.getPaymentIntentId());
+
+        if (!"succeeded".equals(paymentIntent.getStatus())) {
+            throw new RuntimeException("El pago no fue confirmado: estado = " + paymentIntent.getStatus());
+        }
+
+        SaleBean sale = buildSaleEntity(saleDto, true);
+        sale.setPaymentIntentId(paymentIntent.getId());
+        SaleBean saved = saleDao.save(sale);
+
+        Map<String, Object> saleInfo = Map.of(
+                "id_venta", saved.getId_venta(),
+                "date", saved.getDate(),
+                "total_sale", saved.getTotal_sale(),
+                "payment_type", saved.getPayment_type(),
+                "paymentIntentId", paymentIntent.getId()
+        );
+
+        return Map.of(
+                "message", "Venta confirmada y guardada tras pago exitoso",
+                "sale", saleInfo
+        );
     }
 
 
