@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.SIGVEP.config.ApiResponse;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleDto;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleNewDto;
+import utez.edu.mx.SIGVEP.controller.user.dto.UserDto;
 import utez.edu.mx.SIGVEP.service.sale.SaleService;
 
 import java.util.List;
@@ -94,6 +95,19 @@ public class SaleController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse> cambiarEstadoVenta(@PathVariable Integer id) {
+        Optional<SaleDto> usuarioActualizado = saleService.changeStatus(id);
+        ApiResponse response;
+
+        if (usuarioActualizado.isPresent()) {
+            response = new ApiResponse(usuarioActualizado.get(), HttpStatus.OK);
+        } else {
+            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Venta no encontrada para cambiar estado");
+        }
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 
 
 }

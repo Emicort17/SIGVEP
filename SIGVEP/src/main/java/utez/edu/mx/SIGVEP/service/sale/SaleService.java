@@ -12,6 +12,7 @@ import utez.edu.mx.SIGVEP.controller.product.dto.ProductQuantityDto;
 import utez.edu.mx.SIGVEP.controller.product.dto.ProductQuantityNewDto;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleDto;
 import utez.edu.mx.SIGVEP.controller.sale.dto.SaleNewDto;
+import utez.edu.mx.SIGVEP.controller.user.dto.UserDto;
 import utez.edu.mx.SIGVEP.controller.user.dto.UserPublicDto;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.product.ProductRepository;
@@ -219,6 +220,17 @@ public class SaleService {
                                 .getUnit_price())
                 .sum();
     }
+
+
+    @Transactional
+    public Optional<SaleDto> changeStatus(Integer saleId) {
+        return saleDao.findById(saleId).map(sale -> {
+            sale.setStatus(!sale.getStatus());
+            saleDao.save(sale);
+            return toDTO(sale);
+        });
+    }
+
 
 
     private SaleDto toDTO(SaleBean sale) {
