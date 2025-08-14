@@ -23,8 +23,17 @@ const SignIn = () => {
       password: ''
     },
     validationSchema: yup.object({
-      emailOrUsername: yup.string().email('Correo electrónico inválido').required('El correo electrónico es obligatorio'),
-      password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es obligatoria')
+      emailOrUsername: yup.string()
+      .email('Correo electrónico inválido')
+      .required('El correo electrónico es obligatorio'),
+      password: yup.string()
+        .min(6, 'La contraseña debe tener al menos 6 caracteres')
+        .test(
+          "no-spaces",
+          "No se permiten espacios al inicio o final",
+          value => value === undefined || (value === value?.trim())
+        )
+        .required('La contraseña es obligatoria')
     }),
     onSubmit: async (values, { setSubmitting }) => {
       alertaCargando("Iniciando sesión...", "Por favor, espera un momento.");
@@ -34,7 +43,7 @@ const SignIn = () => {
         if (response.data && response.data.token && response.data.user) {
           const { token, user } = response.data;
           if (!user?.rol) {
-            alertaError('Error','El usuario no tiene un rol asignado');
+            alertaError('Error', 'El usuario no tiene un rol asignado');
           }
           const authData = { token, user, signed: true };
           dispatch({
@@ -46,11 +55,10 @@ const SignIn = () => {
           alertaExito('Inicio de sesión exitoso', 'Bienvenido al sistema SIGVEP');
           const redirectTo = user.rol === 'ADMIN_ROLE' ? '/admin' : '/user';
           navigate(redirectTo, { replace: true });
-        } else {
-          alertaError("Error", "Error al iniciar sesión. Por favor, verifica tus credenciales.");
         }
       } catch (error) {
-        alertaError("Error", "Correo y/o contraseña incorrectos");
+        const message = error.response?.data?.message || 'Error al iniciar sesión. Por favor, verifica tus credenciales.';
+        alertaError("Error", message);
       } finally {
         setSubmitting(false);
       }

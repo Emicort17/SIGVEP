@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { alertaExito, alertaError, alertaCargando } from '../../config/context/a
 
 import Logo from '../../assets/icon.svg';
 import Fondo from '../../assets/img/fondo.jpg';
+import { AxiosClient } from '../../config/http-gateway/http-client.js';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -14,21 +15,26 @@ const ForgotPassword = () => {
 
   const formik = useFormik({
     initialValues: {
-      email: ''
+      toEmail: '',
     },
     validationSchema: yup.object({
-      email: yup.string().email('Correo electrónico inválido').required('El correo electrónico es obligatorio')
+      toEmail: yup.string().email('Correo inválido').required('El correo es obligatorio'),
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       alertaCargando("Enviando correo...", "Por favor, espera un momento.");
       try {
-        const response = await AxiosClient.post('/auth/forgot-password', values);
-        if (response.data && response.data.success) {
-          alertaExito("¡Correo enviado!", "Revisa tu bandeja de entrada para continuar con la recuperación.");
+        const response = await AxiosClient.post('/auth/recover/send-mail', values);
+        if (response.data && response.status === "OK") {
+          console.log('ForgotPassword response: ', response.data);
+          alertaExito("¡Correo enviado!", "Revisa tu correo para el código de recuperación.");
           resetForm();
+          sessionStorage.setItem('resetToken', response.data.token);
+          sessionStorage.setItem('email', response.data.correo);
+          navigate("/reset-password");
         }
       } catch (error) {
-        alertaError("Error", "No se pudo enviar el correo. Intenta de nuevo.");
+        const errorMessage = error.response?.data?.message || 'No se pudo enviar el correo.';
+        alertaError("Error", errorMessage);
       } finally {
         setSubmitting(false);
       }
@@ -51,21 +57,21 @@ const ForgotPassword = () => {
           </div>
           <form noValidate onSubmit={formik.handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="email" className={labelStyles}>
+              <label htmlFor="toEmail" className={labelStyles}>
                 Correo Electrónico:
               </label>
               <input
-                id="email"
-                name="email"
+                id="toEmail"
+                name="toEmail"
                 type="email"
-                value={formik.values.email}
+                value={formik.values.toEmail}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 placeholder="Correo electrónico"
                 className={inputStyles}
               />
-              {formik.touched.email && formik.errors.email && (
-                <div className="text-red-600 text-sm mt-2">{formik.errors.email}</div>
+              {formik.touched.toEmail && formik.errors.toEmail && (
+                <div className="text-red-600 text-sm mt-2">{formik.errors.toEmail}</div>
               )}
             </div>
             <button

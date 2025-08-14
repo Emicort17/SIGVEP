@@ -29,9 +29,19 @@ function ChangePasswordModal({ isOpen, onClose, datosPersonales, onSuccess }) {
       oldPassword: yup.string().required('La contraseña actual es obligatoria'),
       newPassword: yup.string()
         .min(6, 'La contraseña debe tener al menos 6 caracteres')
+        .test(
+          "no-spaces",
+          "No se permiten espacios al inicio o final",
+          value => value === undefined || (value === value?.trim())
+        )
         .required('La contraseña es obligatoria'),
       confirmPassword: yup.string()
         .oneOf([yup.ref('newPassword')], 'Las contraseñas no coinciden')
+        .test(
+          "no-spaces",
+          "No se permiten espacios al inicio o final",
+          value => value === undefined || (value === value?.trim())
+        )
         .required('Confirma la nueva contraseña'),
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {

@@ -55,14 +55,14 @@ function Categories() {
     };
 
     return (
-      <div className="bg-white rounded-lg shadow-md flex flex-col items-center p-6 pt-16 relative" style={{ minHeight: 240 }}>
-        <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-24 h-12 bg-custom-blue rounded-b-full flex items-center justify-center">
-          <img src={CategoriaW} alt="Categoría" className="w-7 h-7" />
+      <div className="bg-white rounded-lg shadow-md flex flex-col items-center p-6 pt-20 relative" style={{ minHeight: 240 }}>
+        <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-32 h-16 bg-custom-blue rounded-b-full flex items-center justify-center">
+          <img src={CategoriaW} alt="Categoría" className="w-8 h-8" />
         </div>
         <div className="flex flex-col flex-1 w-full justify-between">
           <div className="text-center mb-4">
             <div className="font-bold text-2xl custom-blue mb-2">{category.name}</div>
-            <div className="text-gray-700 text-base">{category.description}</div>
+            <div className="text-gray-700 text-base line-clamp-4 min-h-[96px]">{category.description}</div>
           </div>
           <div className="flex w-full justify-between items-end mt-auto pt-2">
             <span
@@ -123,11 +123,17 @@ function Categories() {
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {paginatedCategories.map(category => (
-            <div key={category.id_category}>
-              {cardTemplate(category)}
+          {paginatedCategories.length === 0 ? (
+            <div className="col-span-full text-center text-gray-600 py-6 text-xl font-medium">
+              No se encuentran categorías disponibles
             </div>
-          ))}
+          ) : (
+            paginatedCategories.map(category => (
+              <div key={category.id_category}>
+                {cardTemplate(category)}
+              </div>
+            ))
+          )}
         </div>
         <div className="flex justify-center custom-datatable">
           <Paginator

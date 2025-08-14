@@ -36,7 +36,7 @@ export const alertaError = (titulo ,mensaje) => {
         text: mensaje,
         iconColor: '#AB0D2E',
         showConfirmButton: false,
-        timer: 1500,
+        timer: 2000,
         customClass: {
             popup: 'custom-alert-error',
         }

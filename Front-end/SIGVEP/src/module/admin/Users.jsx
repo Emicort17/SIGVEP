@@ -123,10 +123,10 @@ function Users() {
       }}
       tabIndex={-1}
     >
-      <img src={Filter} alt="Filtrar" className="w-4 h-4 cursor-pointer" />
+      <img src={Filter} alt="Filtrar" className="w-4 h-4 cursor-pointer " />
     </button>
     {showStatusDropdown && (
-      <div className="absolute right-0 top-8 z-50 bg-white border rounded shadow p-2 min-w-[120px]">
+      <div className="dropdown-absolute">
         <button
           className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${statusFilter === 'todos' ? 'font-bold text-blue-800' : ''}`}
           onClick={() => { setStatusFilter('todos'); setShowStatusDropdown(false); }}

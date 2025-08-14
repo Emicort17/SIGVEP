@@ -262,3 +262,16 @@ input[type="text"].search-input {
 .custom-row-spacing {
   height: 56px;
 }
+
+.dropdown-absolute {
+  position: fixed !important;
+  z-index: 9999 !important;
+  left: auto !important;
+  right: 12rem !important; 
+  top: 12rem !important;  
+  min-width: 140px;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+}

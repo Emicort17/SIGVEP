@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from 'react-router-dom';
 import { alertaExito, alertaError, alertaCargando } from '../../config/context/alerts.js';
+import { AxiosClient } from '../../config/http-gateway/http-client.js';
 
 import Logo from '../../assets/icon.svg';
 import Fondo from '../../assets/img/fondo.jpg';
@@ -12,9 +13,21 @@ import Ojo1 from '../../assets/eye1.svg';
 const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [finalizado, setFinalizado] = useState(false);
   const navigate = useNavigate();
   const labelStyles = "block mb-2 text-base custom-blue font-medium text-gray-900";
   const inputStyles = "bg-custom-bluelight border-t-0 border-x-0 text-gray-900 text-sm rounded-lg focus:ring-0 block w-full ps-3 p-2.5 custom-border-bottom";
+
+  const token = sessionStorage.getItem('resetToken');
+  const email = sessionStorage.getItem('email');
+
+  useEffect(() => {
+    if (!token || !email) {
+      if (!finalizado) {
+        navigate('/forgot-password', { replace: true });
+      }
+    }
+  }, [navigate, token, email, finalizado]);
 
   const formik = useFormik({
     initialValues: {
@@ -24,7 +37,9 @@ const ResetPassword = () => {
     },
     validationSchema: yup.object({
       code: yup.string().required('El código es obligatorio'),
-      password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es obligatoria'),
+      password: yup.string()
+        .min(6, 'La contraseña debe tener al menos 6 caracteres')
+        .required('La contraseña es obligatoria'),
       confirmPassword: yup.string()
         .oneOf([yup.ref('password'), null], 'Las contraseñas no coinciden')
         .required('Confirma tu contraseña')
@@ -32,11 +47,21 @@ const ResetPassword = () => {
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       alertaCargando("Restableciendo contraseña...", "Por favor, espera un momento.");
       try {
-        const response = await AxiosClient.post('/auth/reset-password', values);
-        if (response.data && response.data.success) {
+        if (values.code !== token) {
+          alertaError("Error", "El código ingresado no es válido.");
+          setSubmitting(false);
+          return;
+        }
+        const response = await AxiosClient.patch(`/usuarios/reset-password/${email}`, {
+          nuevaContrasena: values.password
+        });
+        if (response.status === "OK") {
           alertaExito("¡Contraseña restablecida!", "Ahora puedes iniciar sesión con tu nueva contraseña.");
           resetForm();
-          navigate("/");
+          setFinalizado(true);
+          sessionStorage.removeItem('resetToken');
+          sessionStorage.removeItem('email');
+          navigate("/sign-in", { replace: true });
         }
       } catch (error) {
         alertaError("Error", "No se pudo restablecer la contraseña. Intenta de nuevo.");
@@ -137,7 +162,7 @@ const ResetPassword = () => {
               disabled={formik.isSubmitting || !formik.isValid}
               className="w-full custom-blue-bottom text-white py-2 rounded hover:bg-blue-900 transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-80"
             >
-              Ingresar
+              Cambiar contraseña
             </button>
           </form>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthContext from '../config/context/auth-context';
 import AdminLayout from '../module/admin/AdminLayout';
 import Main from '../module/admin/Main';
@@ -19,8 +19,15 @@ import NewSalesWrapper from '../module/admin/NewSalesWraper';
 import NewSalesWrapperU from '../module/user/NewSalesWrapperU';
 import UserLayout from '../module/user/UserLayout';
 import ProductsU from '../module/user/ProductsU';
-import NewSalesU from '../module/user/NewSalesU';
 import Logo from '../assets/icon.svg';
+
+const ResetPasswordGuard = ({ children }) => {
+  const token = typeof window !== 'undefined' ? sessionStorage.getItem('resetToken') : null;
+  if (!token) {
+    return <Navigate to="/forgot-password" replace />;
+  }
+  return children;
+};
 
 const PublicRoute = ({ children }) => {
   const { user: state } = useContext(AuthContext);
@@ -116,9 +123,9 @@ const AppRouter = () => {
         <Route
           path="/reset-password"
           element={
-            <PublicRoute>
+            <ResetPasswordGuard>
               <ResetPassword />
-            </PublicRoute>
+            </ResetPasswordGuard>
           }
         />
         <Route

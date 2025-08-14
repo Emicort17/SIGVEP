@@ -90,6 +90,7 @@ const CreateUser = () => {
             }
             alertaCargando("Creando cuenta...", "Por favor, espera un momento.");
             try {
+                const usuario = "USER_ROLE";
                 const body = {
                     nombre: values.nombre,
                     apellido: `${values.apellidoPaterno} ${values.apellidoMaterno}`,
@@ -97,16 +98,15 @@ const CreateUser = () => {
                     email: values.email,
                     contrasena: values.password
                 };
-                const response = await AxiosClient.post('/auth/create-user', body);
-                if (response.data && response.data.success) {
+                const response = await AxiosClient.post(`/usuarios/crear/${usuario}`, body);
+                if (response.data && response.status === "CREATED") {
                     alertaExito("¡Cuenta creada!", "Ahora puedes iniciar sesión.");
                     resetForm();
                     navigate("/sign-in");
-                } else {
-                    alertaError("Error", "No se pudo crear la cuenta. Por favor, verifica tus datos.");
                 }
             } catch (error) {
-                alertaError("Error", "No se pudo crear la cuenta. Intenta de nuevo.");
+                const errorMessage = error.response?.data?.message || 'No se pudo crear el usuario';
+                alertaError('Error', errorMessage);
             } finally {
                 setSubmitting(false);
             }
