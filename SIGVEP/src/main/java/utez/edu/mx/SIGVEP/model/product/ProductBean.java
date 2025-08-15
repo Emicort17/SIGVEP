@@ -32,6 +32,9 @@ public class ProductBean {
     @Column(name = "stock", nullable = false)
     private Long stock;
 
+    @Column(name = "clave", nullable = false)
+    private String clave;
+
     @Column(name = "estado", nullable = false)
     private Boolean status;
 

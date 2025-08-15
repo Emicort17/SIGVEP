@@ -12,6 +12,7 @@ import utez.edu.mx.SIGVEP.service.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -34,15 +35,12 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     }
 
     @Override
-    public Boolean sendEmail_password(String toEmail) {
-
+    public String sendEmail_password(String toEmail) {
         Optional<UserBean> foundUser = userService.findByMail(toEmail);
         if (foundUser.isPresent()) {
-
             passwordResetTokenRepository.deleteByUser(foundUser.get());
-
-
-            String token = UUID.randomUUID().toString();
+            int tokenInt = 100000 + new Random().nextInt(900000);
+            String token = String.valueOf(tokenInt);
             LocalDateTime expiration = LocalDateTime.now().plusMinutes(15);
 
             PasswordResetToken resetToken = new PasswordResetToken();
@@ -51,25 +49,26 @@ public class EmailSenderServiceImpl implements EmailSenderService {
             resetToken.setExpirationDate(expiration);
             passwordResetTokenRepository.save(resetToken);
 
-
-            String resetLink = "por definir" + token;
-
+            String messageText = String.format(
+                    "¡Hola %s!\n\n" +
+                            "Hemos recibido una solicitud para restablecer tu contraseña.\n\n" +
+                            "Tu código de verificación es:\n\n" +
+                            "%s\n\n" +
+                            "Este código expirará en 15 minutos.\n\n" +
+                            "Si no solicitaste este cambio, puedes ignorar este mensaje.\n\n" +
+                            "Saludos,\nEquipo de soporte",
+                    foundUser.get().getEmail(), token
+            );
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("SAEMcor@gmail.com");
             message.setTo(toEmail);
             message.setSubject("Recuperación de contraseña");
-            message.setText("Hola " + foundUser.get().getEmail()
-                    + ",\n\nHemos recibido una solicitud para restablecer tu contraseña."
-                    + "\n\nHaz clic en el siguiente enlace para continuar:"
-                    + "\n" + resetLink
-                    + "\n\nEste enlace expirará en 15 minutos."
-                    + "\n\nSi no solicitaste este cambio, puedes ignorar este mensaje.");
+            message.setText(messageText);
             mailSender.send(message);
 
-            return true;
+            return token;
         }
-
-        return false;
+        return null;
     }
 }

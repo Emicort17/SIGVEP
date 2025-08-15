@@ -35,6 +35,9 @@ public class UserDto {
         this.blocked = usuarioEntity.getBlocked();
         this.role = usuarioEntity.getRole();
     }
+    public UserDto(Integer id_usuario) {
+        this.id_usuario = id_usuario;
+    }
 
     public UserBean toEntity() {
         UserBean usuario = new UserBean();

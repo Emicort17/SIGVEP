@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.SIGVEP.controller.user.dto.ChangePasswordDto;
+import utez.edu.mx.SIGVEP.controller.user.dto.ChangeUserPasswordDto;
 import utez.edu.mx.SIGVEP.controller.user.dto.UserDto;
 import utez.edu.mx.SIGVEP.model.user.RoleBean;
 import utez.edu.mx.SIGVEP.model.user.RoleRepository;
@@ -269,7 +270,22 @@ public class UserService {
         return false;
     }
 
+    @Transactional
+    public boolean resetPassword(String email, String nuevaContrasena) {
+        Optional<UserBean> optionalUser = usuarioDao.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            UserBean usuario = optionalUser.get();
+            usuario.setPassword(passwordEncoder.encode(nuevaContrasena));
+            usuarioDao.save(usuario);
+            return true;
+        }
+        return false;
+    }
 
+    @Transactional
+    public UserBean save(UserBean user) {
+        return usuarioDao.save(user);
+    }
 
 
     private UserDto toDTO(UserBean usuario) {

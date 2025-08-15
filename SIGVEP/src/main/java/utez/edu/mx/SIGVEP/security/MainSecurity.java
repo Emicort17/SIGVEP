@@ -29,7 +29,9 @@ import java.util.List;
 public class MainSecurity {
     private static final String[] WHITE_LIST = {
             "/api/auth/**",
-
+            "/api/usuarios/crear/{roleName}",
+            "/api/auth/recover/send-mail",
+            "/api/usuarios/reset-password/{email}"
     };
 
     private final UserDetailsServiceImpl service;

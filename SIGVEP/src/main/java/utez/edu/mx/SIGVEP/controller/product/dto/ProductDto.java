@@ -16,6 +16,7 @@ public class ProductDto {
     private Boolean status;
     private Long stock;
     private CategoryBean category;
+    private String clave;
 
     public ProductDto(ProductBean productEntity) {
         this.id_product = productEntity.getId();
@@ -24,6 +25,7 @@ public class ProductDto {
         this.stock = productEntity.getStock();
         this.status = productEntity.getStatus();
         this.category = productEntity.getCategory();
+        this.clave = productEntity.getClave();
     }
 
     public ProductBean toEntity(){
@@ -34,6 +36,7 @@ public class ProductDto {
         productBean.setStock(this.stock);
         productBean.setStatus(this.status);
         productBean.setCategory(this.category);
+        productBean.setClave(this.clave);
         return productBean;
     }
 }

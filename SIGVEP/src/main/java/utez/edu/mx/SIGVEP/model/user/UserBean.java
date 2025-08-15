@@ -6,6 +6,7 @@ import lombok.*;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
 import utez.edu.mx.SIGVEP.model.user.token.PasswordResetToken;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 
@@ -39,6 +40,11 @@ public class UserBean {
     @Column(columnDefinition = "BOOL DEFAULT false")
     private Boolean blocked;
 
+    @Column(name = "blocked_at")
+    private LocalDateTime blockedAt;
+
+    @Column(name = "failed_attempts")
+    private Integer failedAttempts = 0;
     @ManyToOne
     @JoinColumn(name = "id_role")
     private RoleBean role;
@@ -139,10 +145,26 @@ public class UserBean {
         this.token = token;
     }
 
+    public LocalDateTime getBlockedAt() {
+        return blockedAt;
+    }
+
+    public void setBlockedAt(LocalDateTime blockedAt) {
+        this.blockedAt = blockedAt;
+    }
+
+    public Integer getFailedAttempts() {
+        return failedAttempts;
+    }
+
+    public void setFailedAttempts(Integer failedAttempts) {
+        this.failedAttempts = failedAttempts;
+    }
+
     public UserBean() {
     }
 
-    public UserBean(String name, String surname, String telephone, String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
+    public UserBean(String name, String surname, String telephone, String email, String password, Boolean status, Boolean blocked, LocalDateTime blockedAt, Integer failedAttempts, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
         this.name = name;
         this.surname = surname;
         this.telephone = telephone;
@@ -150,13 +172,14 @@ public class UserBean {
         this.password = password;
         this.status = status;
         this.blocked = blocked;
+        this.blockedAt = blockedAt;
+        this.failedAttempts = failedAttempts;
         this.role = role;
         this.sale = sale;
         this.token = token;
     }
 
-
-    public UserBean(Integer id, String name, String surname, String telephone, String email, String password, Boolean status, Boolean blocked, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
+    public UserBean(Integer id, String name, String surname, String telephone, String email, String password, Boolean status, Boolean blocked, LocalDateTime blockedAt, Integer failedAttempts, RoleBean role, Set<SaleBean> sale, PasswordResetToken token) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -165,6 +188,8 @@ public class UserBean {
         this.password = password;
         this.status = status;
         this.blocked = blocked;
+        this.blockedAt = blockedAt;
+        this.failedAttempts = failedAttempts;
         this.role = role;
         this.sale = sale;
         this.token = token;

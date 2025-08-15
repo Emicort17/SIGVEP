@@ -10,7 +10,7 @@ import lombok.Setter;
 public class SignDto {
     @NotBlank
     @NotEmpty
-    private String emailOrUsername;
+    private String email;
     @NotBlank
     @NotEmpty
     private String password;

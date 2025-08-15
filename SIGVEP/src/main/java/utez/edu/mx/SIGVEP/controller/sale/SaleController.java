@@ -49,6 +49,30 @@ public class SaleController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    // Ventas del día
+    @GetMapping("/dia")
+    public ResponseEntity<ApiResponse> getSalesOfDay() {
+        List<SaleNewDto> sales = saleService.getSalesDay();
+        ApiResponse response = new ApiResponse(sales, HttpStatus.OK);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    // Ventas del mes
+    @GetMapping("/mes")
+    public ResponseEntity<ApiResponse> getSalesOfMonth() {
+        List<SaleNewDto> sales = saleService.getSalesOfMonth();
+        ApiResponse response = new ApiResponse(sales, HttpStatus.OK);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    // Ventas del año
+    @GetMapping("/anio")
+    public ResponseEntity<ApiResponse> getSalesOfYear() {
+        List<SaleNewDto> sales = saleService.getSalesOfYear();
+        ApiResponse response = new ApiResponse(sales, HttpStatus.OK);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
     // Crear nueva venta
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createSale(@Valid @RequestBody SaleDto saleDto) {

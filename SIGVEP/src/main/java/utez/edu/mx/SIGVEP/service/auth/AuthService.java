@@ -21,6 +21,7 @@ import utez.edu.mx.SIGVEP.security.jwt.JwtProvider;
 import utez.edu.mx.SIGVEP.service.user.UserService;
 
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -39,7 +40,7 @@ public class AuthService {
         this.provider = provider;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ResponseEntity<ApiResponse> signIn(String usuario, String contrasenia) {
         try {
             logger.info("Iniciando proceso de autenticación para el usuario: {}", usuario);
@@ -59,51 +60,73 @@ public class AuthService {
             if (!user.getStatus()) {
                 logger.warn("El usuario está inactivo: {}", user.getEmail());
                 return new ResponseEntity<>(
-                        new ApiResponse(HttpStatus.UNAUTHORIZED, true, "Inactivo"),
+                        new ApiResponse(HttpStatus.UNAUTHORIZED, true, "EL usuario está desactivado. Contacte al administrador"),
                         HttpStatus.UNAUTHORIZED
                 );
             }
 
-            if (user.getBlocked()) {
-                logger.warn("El usuario está bloqueado: {}", user.getEmail());
-                return new ResponseEntity<>(
-                        new ApiResponse(HttpStatus.UNAUTHORIZED, true, "Bloqueado"),
-                        HttpStatus.UNAUTHORIZED
-                );
+            if (Boolean.TRUE.equals(user.getBlocked())) {
+                if (user.getBlockedAt() != null &&
+                        user.getBlockedAt().isBefore(LocalDateTime.now().minusMinutes(30))) {
+                    user.setBlocked(false);
+                    user.setBlockedAt(null);
+                    user.setFailedAttempts(0);
+                    service.save(user);
+                    logger.info("Usuario {} desbloqueado automáticamente", user.getEmail());
+                } else {
+                    logger.warn("El usuario {} está bloqueado y no ha pasado el tiempo", user.getEmail());
+                    return new ResponseEntity<>(
+                            new ApiResponse(HttpStatus.UNAUTHORIZED, true, "Cuenta bloqueada, espere 30 minutos"),
+                            HttpStatus.UNAUTHORIZED
+                    );
+                }
             }
 
-            logger.info("Autenticando credenciales para el usuario: {}", usuario);
             Authentication auth = manager.authenticate(
                     new UsernamePasswordAuthenticationToken(usuario, contrasenia)
             );
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            logger.info("Generando token JWT para el usuario: {}", usuario);
+            user.setFailedAttempts(0);
+            service.save(user);
+
             String token = provider.generateToken(auth);
-
             SimpleUserDto simpleUser = new SimpleUserDto(user.getId(), user.getRole().getName());
-
             SignedDto signedDto = new SignedDto(token, "Bearer", simpleUser);
 
             logger.info("Autenticación exitosa para el usuario: {}", usuario);
 
-            return new ResponseEntity<>(
-                    new ApiResponse(signedDto, HttpStatus.OK),
-                    HttpStatus.OK
-            );
+            return new ResponseEntity<>(new ApiResponse(signedDto, HttpStatus.OK), HttpStatus.OK);
 
         } catch (BadCredentialsException e) {
             logger.error("Credenciales incorrectas para el usuario: {}", usuario);
+
+            Optional<UserBean> foundUsuario = service.findByMail(usuario);
+            if (foundUsuario.isPresent()) {
+                UserBean user = foundUsuario.get();
+                user.setFailedAttempts(user.getFailedAttempts() + 1);
+
+                if (user.getFailedAttempts() >= 3) {
+                    user.setBlocked(true);
+                    user.setBlockedAt(LocalDateTime.now());
+                    logger.warn("Usuario {} bloqueado por 30 minutos", user.getEmail());
+                }
+
+                service.save(user);
+            }
+
             return new ResponseEntity<>(
                     new ApiResponse(HttpStatus.BAD_REQUEST, true, "Las credenciales no coinciden"),
                     HttpStatus.BAD_REQUEST
             );
+
         } catch (DisabledException e) {
             logger.error("El usuario está deshabilitado: {}", usuario);
             return new ResponseEntity<>(
-                    new ApiResponse(HttpStatus.UNAUTHORIZED, true, "Usuario desactivado"),
+                    new ApiResponse(HttpStatus.UNAUTHORIZED, true, "EL usuario está desactivado. Contacte al administrador"),
                     HttpStatus.UNAUTHORIZED
             );
+
         } catch (Exception e) {
             logger.error("Error inesperado durante el inicio de sesión para el usuario: {}", usuario, e);
             return new ResponseEntity<>(
@@ -112,4 +135,5 @@ public class AuthService {
             );
         }
     }
+
 }

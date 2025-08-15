@@ -4,15 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import utez.edu.mx.SIGVEP.controller.product.dto.ProductQuantityNewDto;
 import utez.edu.mx.SIGVEP.controller.user.dto.UserPublicDto;
-import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.sale.SaleBean;
-import utez.edu.mx.SIGVEP.model.user.UserBean;
-
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

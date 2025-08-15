@@ -24,6 +24,7 @@ import utez.edu.mx.SIGVEP.model.user.UserRepository;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -229,6 +230,32 @@ public class SaleService {
             saleDao.save(sale);
             return toDTO(sale);
         });
+    }
+
+    @Transactional
+    public List<SaleNewDto> getSalesDay() {
+        logger.info("Obteniendo ventas del día actual");
+        LocalDate today = LocalDate.now();
+        return saleDao.findByDateBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay())
+                .stream().map(this::toNewDTO).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<SaleNewDto> getSalesOfMonth() {
+        logger.info("Obteniendo ventas del mes actual");
+        LocalDate firstDay = LocalDate.now().withDayOfMonth(1);
+        LocalDate firstDayNextMonth = firstDay.plusMonths(1);
+        return saleDao.findByDateBetween(firstDay.atStartOfDay(), firstDayNextMonth.atStartOfDay())
+                .stream().map(this::toNewDTO).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<SaleNewDto> getSalesOfYear() {
+        logger.info("Obteniendo ventas del año actual");
+        LocalDate firstDay = LocalDate.now().withDayOfYear(1);
+        LocalDate firstDayNextYear = firstDay.plusYears(1);
+        return saleDao.findByDateBetween(firstDay.atStartOfDay(), firstDayNextYear.atStartOfDay())
+                .stream().map(this::toNewDTO).collect(Collectors.toList());
     }
 
 

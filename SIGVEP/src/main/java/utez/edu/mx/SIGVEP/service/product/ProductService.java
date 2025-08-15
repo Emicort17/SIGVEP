@@ -81,6 +81,7 @@ public class ProductService {
                 .name(productBean.getName())
                 .unit_price(productBean.getUnit_price())
                 .stock(productBean.getStock())
+                .clave(productBean.getClave())
                 .status(productBean.getStatus())
                 .category(productBean.getCategory())
                 .build();

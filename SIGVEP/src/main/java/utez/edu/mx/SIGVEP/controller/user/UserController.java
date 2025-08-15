@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.SIGVEP.config.ApiResponse;
 import utez.edu.mx.SIGVEP.controller.user.dto.ChangePasswordDto;
+import utez.edu.mx.SIGVEP.controller.user.dto.ChangeUserPasswordDto;
 import utez.edu.mx.SIGVEP.controller.user.dto.UserDto;
 import utez.edu.mx.SIGVEP.service.user.UserService;
 
@@ -36,6 +37,21 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getUsuarioById(@PathVariable Integer id) {
         Optional<UserDto> usuario = usuarioService.getUsuarioById(id);
+        ApiResponse response;
+
+        if (usuario.isPresent()) {
+            response = new ApiResponse(usuario.get(), HttpStatus.OK);
+        } else {
+            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado");
+        }
+
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    // Obtener un usuario por correo electrónico
+    @GetMapping("/email/{email}")
+    public ResponseEntity<ApiResponse> getUsuarioByEmail(@PathVariable String email) {
+        Optional<UserDto> usuario = usuarioService.getUsuarioByEmail(email);
         ApiResponse response;
 
         if (usuario.isPresent()) {
@@ -149,5 +165,20 @@ public class UserController {
 
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+    @PatchMapping("/reset-password/{email}")
+    public ResponseEntity<ApiResponse> resetPassword(
+            @PathVariable String email,
+            @RequestBody ChangeUserPasswordDto dto) {
+        boolean success = usuarioService.resetPassword(email, dto.getNuevaContrasena());
+        ApiResponse response;
+        if (success) {
+            response = new ApiResponse(HttpStatus.OK, false, "Contraseña actualizada correctamente");
+        } else {
+            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Usuario no encontrado para cambiar la contraseña");
+        }
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
 
 }
