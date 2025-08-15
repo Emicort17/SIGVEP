@@ -114,6 +114,7 @@ function Products() {
 
   const filteredProducts = products.filter((p) => {
     const matchesSearch =
+      (p.clave || '').toLowerCase().includes(search.toLowerCase()) ||
       (p.name || '').toLowerCase().includes(search.toLowerCase()) ||
       (p.category?.name || '').toLowerCase().includes(search.toLowerCase()) ||
       (p.unit_price?.toString() || '').includes(search);
@@ -146,7 +147,7 @@ function Products() {
         <img src={Filter} alt="Filtrar" className="w-4 h-4 cursor-pointer" />
       </button>
       {showStatusDropdown && (
-        <div className="absolute right-0 top-8 z-50 bg-white border rounded shadow p-2 min-w-[120px]">
+        <div className="dropdown-absolute2">
           <button
             className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${statusFilter === 'todos' ? 'font-bold text-blue-800' : ''}`}
             onClick={() => { setStatusFilter('todos'); setShowStatusDropdown(false); }}
@@ -185,7 +186,7 @@ function Products() {
         <img src={Filter} alt="Filtrar" className="w-4 h-4 cursor-pointer" />
       </button>
       {showStockDropdown && (
-        <div className="absolute right-0 top-8 z-50 bg-white border rounded shadow p-2 min-w-[120px]">
+        <div className="dropdown-absolute1">
           <button
             className={`block w-full text-left px-2 py-1 mb-1 text-black hover:bg-blue-100 rounded cursor-pointer ${stockFilter === 'todos' ? 'font-bold text-blue-800' : ''}`}
             onClick={() => { setStockFilter('todos'); setShowStockDropdown(false); }}
@@ -261,7 +262,11 @@ function Products() {
           >
             <Column body={rowNumberTemplate} header="#" style={{ width: '40px' }} />
             <Column field="clave" header="Clave" style={{ minWidth: '80px' }} />
-            <Column field="name" header="Nombre" style={{ minWidth: '200px' }} />
+            <Column field="name" header="Nombre" style={{ minWidth: '200px' }} body={rowData => (
+              <span className="truncate block max-w-xs" title={rowData.name}>
+                {rowData.name}
+              </span>
+            )} />
             <Column body={priceBodyTemplate} header="Precio" style={{ minWidth: '100px' }} />
             <Column body={stockBodyTemplate} header={stockHeaderTemplate} style={{ minWidth: '80px' }} />
             <Column body={categoryBodyTemplate} header="Categoría" style={{ minWidth: '150px' }} />

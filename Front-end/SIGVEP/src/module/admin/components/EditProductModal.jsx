@@ -79,7 +79,8 @@ function EditProductModal({ isOpen, onClose, productData, onSuccess }) {
                     onClose();
                 }
             } catch (error) {
-                alertaError('Error', 'No se pudo actualizar el producto');
+                const mensaje = error.response?.data?.message || 'No se pudo actualizar el producto';
+                alertaError('Error', mensaje);
             } finally {
                 setSubmitting(false);
             }

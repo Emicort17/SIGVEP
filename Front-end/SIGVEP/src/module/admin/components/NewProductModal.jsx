@@ -72,6 +72,7 @@ function NewProductModal({ isOpen, onClose, onSuccess }) {
                         id_category: parseInt(values.category_id)
                     }
                 };
+                console.log('Creating product with body:', body);
                 const response = await AxiosClient.post('/productos/create', body);
                 if (response?.data) {
                     alertaExito('Éxito', '¡Producto creado correctamente!');
@@ -80,7 +81,8 @@ function NewProductModal({ isOpen, onClose, onSuccess }) {
                     onClose();
                 }
             } catch (error) {
-                alertaError('Error', 'No se pudo crear el producto');
+                const mensaje = error.response?.data?.message || 'No se pudo crear el producto';
+                alertaError('Error', mensaje);
             } finally {
                 setSubmitting(false);
             }

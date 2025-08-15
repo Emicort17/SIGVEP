@@ -74,6 +74,7 @@ function ProductsU() {
 
   const filteredProducts = products.filter((p) => {
     const matchesSearch =
+      (p.clave || '').toLowerCase().includes(search.toLowerCase()) ||
       (p.name || '').toLowerCase().includes(search.toLowerCase()) ||
       (p.category?.name || '').toLowerCase().includes(search.toLowerCase()) ||
       (p.unit_price?.toString() || '').includes(search);

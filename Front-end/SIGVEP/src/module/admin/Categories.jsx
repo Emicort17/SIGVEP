@@ -4,6 +4,7 @@ import Add from '../../assets/addw.svg';
 import EditW from '../../assets/editw.svg';
 import Search from '../../assets/search1.svg';
 import CategoriaW from '../../assets/categoryw.svg';
+import Filter from '../../assets/filter.svg';
 import { AxiosClient } from '../../config/http-gateway/http-client';
 import { alertaCargando, alertaError, alertaExito, alertaPregunta } from '../../config/context/alerts';
 import NewCategoryModal from './components/NewCategoryModal';
@@ -16,6 +17,8 @@ function Categories() {
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showEditCategoryModal, setShowEditCategoryModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('todos');
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const rows = 6;
 
   const fetchCategories = async () => {
@@ -31,10 +34,26 @@ function Categories() {
     fetchCategories();
   }, []);
 
-  const filteredCategories = categories.filter(c =>
-    (c.name || '').toLowerCase().includes(search.toLowerCase()) ||
-    (c.description || '').toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.status-dropdown-btn')) setShowStatusDropdown(false);
+    };
+    if (showStatusDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showStatusDropdown]);
+
+  const filteredCategories = categories.filter(c => {
+    const matchesSearch =
+      (c.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (c.description || '').toLowerCase().includes(search.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'todos' ||
+      (statusFilter === 'habilitado' && c.status === true) ||
+      (statusFilter === 'deshabilitado' && c.status === false);
+    return matchesSearch && matchesStatus;
+  });
 
   const cardTemplate = (category) => {
     const handleStatusChange = async () => {
@@ -109,7 +128,7 @@ function Categories() {
             Nueva Categoría
           </button>
         </div>
-        <div className="mb-4 relative w-full">
+        <div className="mb-4 relative w-full flex items-center gap-x-4">
           <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <img src={Search} alt="Buscar" className="w-4 h-4" />
           </span>
@@ -121,6 +140,39 @@ function Categories() {
             className="search-input"
             style={{ paddingLeft: '2rem' }}
           />
+          <div className="relative status-dropdown-btn">
+            <button
+              type="button"
+              className="custom-blue-bottom text-white py-2 px-6 rounded-lg hover:bg-blue-900 transition cursor-pointer flex items-center gap-3 status-dropdown-btn min-w-[130px]"
+              onClick={() => setShowStatusDropdown((prev) => !prev)}
+              tabIndex={-1}
+            >
+              <img src={Filter} alt="Filtrar" className="w-5" />
+              <span className="">Estado</span>
+            </button>
+            {showStatusDropdown && (
+              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] status-dropdown-btn">
+                <button
+                  className={`block w-full text-left px-4 py-2 hover:bg-blue-50 rounded-t-lg ${statusFilter === 'todos' ? 'font-bold text-blue-800' : ''}`}
+                  onClick={() => { setStatusFilter('todos'); setShowStatusDropdown(false); }}
+                >
+                  Todos
+                </button>
+                <button
+                  className={`block w-full text-left px-4 py-2 hover:bg-green-50 ${statusFilter === 'habilitado' ? 'font-bold text-green-700' : ''}`}
+                  onClick={() => { setStatusFilter('habilitado'); setShowStatusDropdown(false); }}
+                >
+                  Habilitados
+                </button>
+                <button
+                  className={`block w-full text-left px-4 py-2 hover:bg-red-50 rounded-b-lg ${statusFilter === 'deshabilitado' ? 'font-bold text-red-700' : ''}`}
+                  onClick={() => { setStatusFilter('deshabilitado'); setShowStatusDropdown(false); }}
+                >
+                  Deshabilitados
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {paginatedCategories.length === 0 ? (

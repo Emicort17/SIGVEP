@@ -113,7 +113,7 @@ function Users() {
 
   const statusHeaderTemplate = () => (
   <div className="relative flex items-center gap-2">
-    <span>Estatus</span>
+    <span>Estado</span>
     <button
       type="button"
       className="focus:outline-none px-2"
