@@ -19,11 +19,11 @@ const SignIn = () => {
 
   const formik = useFormik({
     initialValues: {
-      emailOrUsername: '',
+      email: '',
       password: ''
     },
     validationSchema: yup.object({
-      emailOrUsername: yup.string()
+      email: yup.string()
       .email('Correo electrónico inválido')
       .required('El correo electrónico es obligatorio'),
       password: yup.string()
@@ -80,21 +80,21 @@ const SignIn = () => {
             </div>
             <form noValidate onSubmit={formik.handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="emailOrUsername" className={labelStyles}>
+                <label htmlFor="email" className={labelStyles}>
                   Correo Electrónico:
                 </label>
                 <input
-                  id="emailOrUsername"
-                  name="emailOrUsername"
+                  id="email"
+                  name="email"
                   type="email"
-                  value={formik.values.emailOrUsername}
+                  value={formik.values.email}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   placeholder="Correo electrónico"
                   className={inputStyles}
                 />
-                {formik.touched.emailOrUsername && formik.errors.emailOrUsername && (
-                  <div className="text-red-600 text-sm mt-2">{formik.errors.emailOrUsername}</div>
+                {formik.touched.email && formik.errors.email && (
+                  <div className="text-red-600 text-sm mt-2">{formik.errors.email}</div>
                 )}
               </div>
               <div className="mb-2 relative">
