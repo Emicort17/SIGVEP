@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
+    private static final int MAX_DESCRIPTION_LENGTH = 255;
 
     @Autowired
     private final CategoryRepository categoryDao;
@@ -73,10 +74,18 @@ public class CategoryService {
     }
 
     private CategoryDto toDTO(CategoryBean categoryBean){
+        String description = categoryBean.getDescription();
+        if (description == null) {
+            description = "";
+        }
+        if (description.length() > MAX_DESCRIPTION_LENGTH) {
+            throw new IllegalArgumentException("La descripción sobrepasa el máximo de " + MAX_DESCRIPTION_LENGTH + " caracteres.");
+        }
+        categoryBean.setDescription(description);
         return CategoryDto.builder()
                 .id_category(categoryBean.getId_category())
                 .name(categoryBean.getName())
-                .description(categoryBean.getDescription())
+                .description(description)
                 .status(categoryBean.getStatus())
                 .build();
     }

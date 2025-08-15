@@ -24,7 +24,9 @@ import utez.edu.mx.SIGVEP.model.user.UserRepository;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -237,7 +239,23 @@ public class SaleService {
         logger.info("Obteniendo ventas del día actual");
         LocalDate today = LocalDate.now();
         return saleDao.findByDateBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay())
-                .stream().map(this::toNewDTO).collect(Collectors.toList());
+                .stream()
+                .filter(sale -> Boolean.TRUE.equals(sale.getStatus()))
+                .map(this::toNewDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<SaleNewDto> getSalesOfWeek() {
+        logger.info("Obteniendo ventas de la semana actual");
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        return saleDao.findByDateBetween(startOfWeek.atStartOfDay(), endOfWeek.plusDays(1).atStartOfDay())
+                .stream()
+                .filter(sale -> Boolean.TRUE.equals(sale.getStatus()))
+                .map(this::toNewDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -246,7 +264,10 @@ public class SaleService {
         LocalDate firstDay = LocalDate.now().withDayOfMonth(1);
         LocalDate firstDayNextMonth = firstDay.plusMonths(1);
         return saleDao.findByDateBetween(firstDay.atStartOfDay(), firstDayNextMonth.atStartOfDay())
-                .stream().map(this::toNewDTO).collect(Collectors.toList());
+                .stream()
+                .filter(sale -> Boolean.TRUE.equals(sale.getStatus()))
+                .map(this::toNewDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -255,7 +276,10 @@ public class SaleService {
         LocalDate firstDay = LocalDate.now().withDayOfYear(1);
         LocalDate firstDayNextYear = firstDay.plusYears(1);
         return saleDao.findByDateBetween(firstDay.atStartOfDay(), firstDayNextYear.atStartOfDay())
-                .stream().map(this::toNewDTO).collect(Collectors.toList());
+                .stream()
+                .filter(sale -> Boolean.TRUE.equals(sale.getStatus()))
+                .map(this::toNewDTO)
+                .collect(Collectors.toList());
     }
 
 

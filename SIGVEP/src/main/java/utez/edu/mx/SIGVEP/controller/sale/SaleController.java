@@ -57,6 +57,13 @@ public class SaleController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    @GetMapping("/semana")
+    public ResponseEntity<ApiResponse> getSalesOfWeek() {
+        List<SaleNewDto> sales = saleService.getSalesOfWeek();
+        ApiResponse response = new ApiResponse(sales, HttpStatus.OK);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
     // Ventas del mes
     @GetMapping("/mes")
     public ResponseEntity<ApiResponse> getSalesOfMonth() {

@@ -74,9 +74,11 @@ public class AuthService {
                     service.save(user);
                     logger.info("Usuario {} desbloqueado automáticamente", user.getEmail());
                 } else {
+                    long minutosRestantes = 30 - java.time.Duration.between(user.getBlockedAt(), LocalDateTime.now()).toMinutes();
+                    minutosRestantes = Math.max(minutosRestantes, 0);
                     logger.warn("El usuario {} está bloqueado y no ha pasado el tiempo", user.getEmail());
                     return new ResponseEntity<>(
-                            new ApiResponse(HttpStatus.UNAUTHORIZED, true, "Cuenta bloqueada, espere 30 minutos"),
+                            new ApiResponse(HttpStatus.UNAUTHORIZED, true, "Cuenta bloqueada, espere " + minutosRestantes + " minutos"),
                             HttpStatus.UNAUTHORIZED
                     );
                 }

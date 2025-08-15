@@ -59,14 +59,20 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateCategory(@PathVariable Integer id, @RequestBody CategoryDto categoryDto) {
-        Optional<CategoryDto> updateCategory = categoryService.update(categoryDto, id);
-        ApiResponse apiResponse;
-        if (updateCategory.isPresent()) {
-            apiResponse = new ApiResponse(updateCategory.get(), HttpStatus.OK);
-        }else{
-            apiResponse = new ApiResponse(HttpStatus.NOT_FOUND, true,  "Categoria no encontrado");
+        ApiResponse response;
+        try {
+            Optional<CategoryDto> updateCategory = categoryService.update(categoryDto, id);
+            if (updateCategory.isPresent()) {
+                response = new ApiResponse(updateCategory.get(), HttpStatus.OK);
+            } else {
+                response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Categoria no encontrado");
+            }
+        } catch (IllegalArgumentException e) {
+            response = new ApiResponse(HttpStatus.BAD_REQUEST, true, e.getMessage());
+        } catch (Exception e) {
+            response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, true, e.getMessage());
         }
-        return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping("/{id}")

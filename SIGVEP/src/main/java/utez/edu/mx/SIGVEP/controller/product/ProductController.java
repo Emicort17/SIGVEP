@@ -57,12 +57,18 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable Integer id, @RequestBody ProductDto product) {
-        Optional<ProductDto> updateProduct = productService.update(product, id);
         ApiResponse response;
-        if (updateProduct.isPresent()) {
-            response = new ApiResponse(updateProduct.get(), HttpStatus.OK);
-        }else{
-            response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Producto no encontrado para actualizar");
+        try {
+            Optional<ProductDto> updateProduct = productService.update(product, id);
+            if (updateProduct.isPresent()) {
+                response = new ApiResponse(updateProduct.get(), HttpStatus.OK);
+            } else {
+                response = new ApiResponse(HttpStatus.NOT_FOUND, true, "Producto no encontrado para actualizar");
+            }
+        } catch (IllegalArgumentException e) {
+            response = new ApiResponse(HttpStatus.BAD_REQUEST, true, e.getMessage());
+        } catch (Exception e) {
+            response = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, true, e.getMessage());
         }
         return new ResponseEntity<>(response, response.getStatus());
     }

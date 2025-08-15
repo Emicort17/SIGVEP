@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.SIGVEP.controller.product.dto.ProductDto;
+import utez.edu.mx.SIGVEP.model.category.CategoryBean;
 import utez.edu.mx.SIGVEP.model.category.CategoryRepository;
 import utez.edu.mx.SIGVEP.model.product.ProductBean;
 import utez.edu.mx.SIGVEP.model.product.ProductRepository;
@@ -46,6 +47,7 @@ public class ProductService {
 
     @Transactional
     public ProductDto register(ProductDto productDto){
+        validateProductData(productDto);
         ProductBean product = new ProductBean();
         setProductData(product, productDto, true);
         ProductBean savedProduct = productDao.save(product);
@@ -54,6 +56,7 @@ public class ProductService {
 
     @Transactional
     public Optional<ProductDto> update(ProductDto productDto, Integer id){
+        validateProductData(productDto);
         Optional<ProductBean> existingProduct = productDao.findById(id);
         if(existingProduct.isPresent()){
             ProductBean productBean = existingProduct.get();
@@ -75,6 +78,20 @@ public class ProductService {
         return Optional.empty();
     }
 
+    private void validateProductData(ProductDto productDto) {
+        if (productDto.getUnit_price() < 0) {
+            throw new IllegalArgumentException("El precio unitario no puede ser negativo.");
+        }
+        if (productDto.getStock() < 0) {
+            throw new IllegalArgumentException("El stock no puede ser negativo.");
+        }
+        CategoryBean category = categoryRepository.findById(productDto.getCategory().getId_category())
+                .orElseThrow(() -> new IllegalArgumentException("La categoría no existe."));
+        if (!category.getStatus()) {
+            throw new IllegalArgumentException("No se pueden agregar productos a una categoría desactivada.");
+        }
+    }
+
     private ProductDto toDTO(ProductBean productBean) {
         return ProductDto.builder()
                 .id_product(productBean.getId())
@@ -92,6 +109,7 @@ public class ProductService {
         productBean.setName(productDto.getName());
         productBean.setUnit_price(productDto.getUnit_price());
         productBean.setStock(productDto.getStock());
+        productBean.setClave(productDto.getClave());
         if (productDto.getCategory() != null && productDto.getCategory().getId_category() != null) {
             productBean.setCategory(categoryRepository.findById(productDto.getCategory().getId_category())
                     .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada")));
