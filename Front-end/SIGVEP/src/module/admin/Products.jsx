@@ -260,6 +260,7 @@ function Products() {
             emptyMessage={<span className="text-gray-500">No hay productos</span>}
           >
             <Column body={rowNumberTemplate} header="#" style={{ width: '40px' }} />
+            <Column field="clave" header="Clave" style={{ minWidth: '80px' }} />
             <Column field="name" header="Nombre" style={{ minWidth: '200px' }} />
             <Column body={priceBodyTemplate} header="Precio" style={{ minWidth: '100px' }} />
             <Column body={stockBodyTemplate} header={stockHeaderTemplate} style={{ minWidth: '80px' }} />

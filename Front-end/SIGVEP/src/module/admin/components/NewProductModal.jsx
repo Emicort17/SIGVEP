@@ -13,6 +13,14 @@ function NewProductModal({ isOpen, onClose, onSuccess }) {
     const [categories, setCategories] = useState([]);
 
     const validationSchema = yup.object({
+        clave: yup.
+            string()
+            .test(
+                "no-spaces",
+                "No se permiten espacios al inicio o final",
+                value => value === undefined || (value === value?.trim())
+            )
+            .required("La clave es obligatoria"),
         name: yup
             .string()
             .test(
@@ -37,6 +45,7 @@ function NewProductModal({ isOpen, onClose, onSuccess }) {
 
     const formik = useFormik({
         initialValues: {
+            clave: '',
             name: '',
             unit_price: '',
             stock: '',
@@ -55,6 +64,7 @@ function NewProductModal({ isOpen, onClose, onSuccess }) {
             alertaCargando('Creando producto...', 'Por favor, espere');
             try {
                 const body = {
+                    clave: values.clave,
                     name: values.name,
                     unit_price: parseFloat(values.unit_price),
                     stock: parseInt(values.stock),
@@ -105,6 +115,22 @@ function NewProductModal({ isOpen, onClose, onSuccess }) {
                 </div>
                 <h2 className="text-2xl font-bold text-center mb-6 font-poppins">Crear Producto</h2>
                 <form onSubmit={formik.handleSubmit} className="space-y-4">
+                    <div>
+                        <label className={labelStyles}>Clave:</label>
+                        <input
+                            type="text"
+                            name="clave"
+                            value={formik.values.clave}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            className={inputStyles}
+                            placeholder="Ej: RI-001"
+                            required
+                        />
+                        {formik.touched.clave && formik.errors.clave && (
+                            <div className="text-red-600 text-sm mt-1">{formik.errors.clave}</div>
+                        )}
+                    </div>
                     <div>
                         <label className={labelStyles}>Nombre:</label>
                         <input

@@ -221,6 +221,7 @@ function ProductsU() {
             rowClassName={() => 'custom-row-spacing'}
           >
             <Column body={rowNumberTemplate} header="#" style={{ width: '40px' }} />
+            <Column field="clave" header="Clave" style={{ minWidth: '80px' }} />
             <Column field="name" header="Nombre" style={{ minWidth: '180px' }} />
             <Column body={priceBodyTemplate} header="Precio" style={{ minWidth: '100px' }} />
             <Column body={stockBodyTemplate} header={stockHeaderTemplate} style={{ minWidth: '80px' }} />
